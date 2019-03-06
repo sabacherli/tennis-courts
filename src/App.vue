@@ -31,6 +31,7 @@ button:hover {
 button:active {
   cursor: pointer;
   box-shadow: 0px 0px 1px rgba(0,0,0,0.4);
+
 }
 input {
   height: 25px;

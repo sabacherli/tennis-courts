@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     createPlayer () {
-      
+
     }
   }
 }
@@ -33,8 +33,8 @@ export default {
 
 <style lang="css" scoped>
 h1 {
-  position: fixed;
-  top: 20%;
+  position: relative;
+  top: 160px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 5em;

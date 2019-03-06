@@ -10,16 +10,17 @@ export default new Router({
     {
       path: '/',
       name: 'Register',
-      meta: {
-        title: 'Tennis Court',
-        metaTags: [
-          {
-            name: 'Booking Engine',
-            content: 'Enable your tennis courts to be booked automatically.'
-          }
-        ]
-      },
       component: () => import(/* webpackChunkName: "register" */ './views/Register.vue')
+    },
+    {
+      path: '/owner',
+      name: 'Owner',
+      component: () => import(/* webpackChunkName: "owner" */ './views/Owner.vue')
+    },
+    {
+      path: '/player',
+      name: 'Player',
+      component: () => import(/* webpackChunkName: "player" */ './views/Player.vue')
     }
   ]
 })

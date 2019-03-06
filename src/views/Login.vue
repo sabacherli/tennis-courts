@@ -1,22 +1,16 @@
 <template lang="html">
   <div class="">
-    <h1>PLAYER</h1>
-    <h2>Create an Account</h2>
+    <h1>LOGIN</h1>
+    <h2>Log in to your account</h2>
     <div class="container">
-      <form id="" action="" method="">
-        <input type="email" v-model="email" placeholder="Email" autocomplete="email" required>
-        <br>
-        <input type="password" v-model="password" placeholder="Password" autocomplete="current-password" @keyup.enter="createUser()" required>
-        <br>
-        <button style="margin-top: 40px" type="button" @click="createPlayer()">Register</button>
-      </form>
+
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Player',
+  name: 'Login',
   data () {
     return {
       email: '',
@@ -24,9 +18,7 @@ export default {
     }
   },
   methods: {
-    createPlayer () {
 
-    }
   }
 }
 </script>

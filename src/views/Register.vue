@@ -34,7 +34,7 @@ h1 {
 }
 h2 {
   position: relative;
-  top: 280px;
+  top: 95px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.9em;
@@ -42,7 +42,7 @@ h2 {
 }
 .container {
   position: relative;
-  top: 400px;
+  top: 170px;
   left: 0;
   width: 100%;
 }

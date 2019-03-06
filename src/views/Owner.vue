@@ -15,6 +15,10 @@
 </template>
 
 <script>
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import db from '@/database.js'
+import router from '../router.js'
 export default {
   name: 'Owner',
   data () {
@@ -25,7 +29,20 @@ export default {
   },
   methods: {
     createOwner () {
-
+      firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
+        .then(function (user) {
+          db.collection('owners').doc(user.user.uid).set({
+            uid: user.user.uid,
+            role: 'Owner'
+          })
+          router.push('login')
+        })
+        .catch(function (error) {
+          // Handle Errors here.
+          var errorCode = error.code
+          var errorMessage = error.message
+          console.log(errorCode, ': ', errorMessage)
+        })
     }
   }
 }
@@ -42,7 +59,7 @@ h1 {
 }
 h2 {
   position: relative;
-  top: 280px;
+  top: 95px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.9em;
@@ -50,7 +67,7 @@ h2 {
 }
 .container {
   position: relative;
-  top: 400px;
+  top: 170px;
   left: 0;
   width: 100%;
 }

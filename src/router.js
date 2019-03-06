@@ -21,6 +21,16 @@ export default new Router({
       path: '/player',
       name: 'Player',
       component: () => import(/* webpackChunkName: "player" */ './views/Player.vue')
+    },
+    {
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard.vue')
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
     }
   ]
 })

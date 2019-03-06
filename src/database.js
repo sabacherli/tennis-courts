@@ -3,14 +3,14 @@ import 'firebase/firestore'
 
 // Initialize Firebase
 var config = {
-  apiKey: "AIzaSyC0vAuSNH_WTR3Z3VYPC83JHuVrB694q2o",
-  authDomain: "tenniscourt-hsg.firebaseapp.com",
-  databaseURL: "https://tenniscourt-hsg.firebaseio.com",
-  projectId: "tenniscourt-hsg",
-  storageBucket: "tenniscourt-hsg.appspot.com",
-  messagingSenderId: "31727843948"
+  apiKey: 'AIzaSyC0vAuSNH_WTR3Z3VYPC83JHuVrB694q2o',
+  authDomain: 'tenniscourt-hsg.firebaseapp.com',
+  databaseURL: 'https://tenniscourt-hsg.firebaseio.com',
+  projectId: 'tenniscourt-hsg',
+  storageBucket: 'tenniscourt-hsg.appspot.com',
+  messagingSenderId: '31727843948'
 }
-firebase.initializeApp(config);
+const firebaseApp = firebase.initializeApp(config)
 
 const settings = {
   /* your settings... */ timestampsInSnapshots: true

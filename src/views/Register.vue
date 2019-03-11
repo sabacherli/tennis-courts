@@ -3,8 +3,8 @@
     <h1>TENNIS COURT</h1>
     <h2>A Booking Engine for your Tennis Courts</h2>
     <div class="container">
-      <button class="" @click="goPlayer()">Player</button>
-      <button class="" @click="goOwner()">Owner</button>
+      <button @click="goPlayer()">Player</button>
+      <button @click="goOwner()">Owner</button>
     </div>
   </div>
 </template>

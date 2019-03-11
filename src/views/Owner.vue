@@ -3,21 +3,24 @@
     <h1>OWNER</h1>
     <h2>Create an Account</h2>
     <div class="container">
-      <form id="" action="" method="">
+      <form method="post">
         <input type="email" v-model="email" placeholder="Email" autocomplete="email" required>
         <br>
         <input type="password" v-model="password" placeholder="Password" autocomplete="current-password" @keyup.enter="createUser()" required>
         <br>
-        <button style="margin-top: 40px" type="button" @click="createOwner()">Register</button>
+        <button type="button" @click="createOwner()">Register</button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
+// required to create a user
 import firebase from 'firebase/app'
 import 'firebase/auth'
+// required to interact with the database
 import db from '@/database.js'
+// required to call router within the function
 import router from '../router.js'
 export default {
   name: 'Owner',
@@ -29,16 +32,22 @@ export default {
   },
   methods: {
     createOwner () {
+      // creates a new account with email and password and logs in the user
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
         .then(function (user) {
-          db.collection('owners').doc(user.user.uid).set({
+          // then creates a new document in the users collection
+          db.collection('users').doc(user.user.uid).set({
+            email: user.user.email,
             uid: user.user.uid,
-            role: 'Owner'
+            role: 'Owner',
+            courts: 0,
+            assets: []
           })
-          router.push('login')
+          // changes the page to dashboard
+          router.push('dashboard')
         })
         .catch(function (error) {
-          // Handle Errors here.
+          // log errors to the console with code and message
           var errorCode = error.code
           var errorMessage = error.message
           console.log(errorCode, ': ', errorMessage)
@@ -64,6 +73,22 @@ h2 {
   transform: translateX(-50%);
   font-size: 1.9em;
   color: darkgray;
+}
+button {
+  margin-top: 40px;
+}
+input {
+  margin: 5px 0 5px 0;
+  padding: 2px 2px 2px 20px;
+  height: 25px;
+  width: 400px;
+  font-size: 1em;
+  font-weight: 500;
+  border: 2px solid black;
+  border-radius: 20px 20px;
+}
+input:focus {
+  background-color: rgba(181, 181, 181, 0.25);
 }
 .container {
   position: relative;

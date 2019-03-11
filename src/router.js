@@ -10,27 +10,42 @@ export default new Router({
     {
       path: '/',
       name: 'Register',
-      component: () => import(/* webpackChunkName: "register" */ './views/Register.vue')
+      components: {
+        dropdown: () => import(/* webpackChunkName: "dropdown" */ './components/Dropdown.vue'),
+        default: () => import(/* webpackChunkName: "register" */ './views/Register.vue')
+      }
     },
     {
       path: '/owner',
       name: 'Owner',
-      component: () => import(/* webpackChunkName: "owner" */ './views/Owner.vue')
+      components: {
+        dropdown: () => import(/* webpackChunkName: "dropdown" */ './components/Dropdown.vue'),
+        default: () => import(/* webpackChunkName: "owner" */ './views/Owner.vue')
+      }
     },
     {
       path: '/player',
       name: 'Player',
-      component: () => import(/* webpackChunkName: "player" */ './views/Player.vue')
+      components: {
+        dropdown: () => import(/* webpackChunkName: "dropdown" */ './components/Dropdown.vue'),
+        default: () => import(/* webpackChunkName: "player" */ './views/Player.vue')
+      }
     },
     {
       path: '/dashboard',
       name: 'Dashboard',
-      component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard.vue')
+      components: {
+        dropdown: () => import(/* webpackChunkName: "dropdown" */ './components/Dropdown.vue'),
+        default: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard.vue')
+      }
     },
     {
       path: '/login',
       name: 'Login',
-      component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
+      components: {
+        dropdown: () => import(/* webpackChunkName: "dropdown" */ './components/Dropdown.vue'),
+        default: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
+      }
     }
   ]
 })

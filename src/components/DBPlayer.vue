@@ -19,13 +19,13 @@
         <div :key="club.uid" class="div-club">
           <span class="club-name">Unique ID: {{ club.uid }}</span>
           <span class="club-courts">Courts: {{ club.courts }}</span>
-          <button type="button" class="check-availability" @click="checkAvailability()">Check Availability</button>
+          <button type="button" class="check-availability" @click="checkAvailability(club)">Check Availability</button>
         </div>
       </template>
     </div>
     <!-- is the search filter is active, then show the search field -->
     <div v-if="playerFilters[1].isActive">
-      <p class="instruction">Enter the ID of a know tennis club:</p>
+      <p class="instruction">Enter the ID of a known tennis club:</p>
       <form>
         <!-- the v-model is used to retrieve the input data -->
         <input type="text" placeholder="e.g. wPpDZo3Qrdz3Pkh2G6XW" v-model="uniqueID">
@@ -34,8 +34,39 @@
         <button type="button" @click="searchClub()">Search</button>
       </form>
       <!-- if the searchResult is not null, then show the following div -->
-      <div v-if="searchResult">
-
+      <div v-if="searchResult" class="container-assets">
+        <!-- this template is displayed for all assets in userData.assets -->
+        <template v-for="asset in searchResult.assets">
+          <!-- the key directive is required by vue -->
+          <div :key="asset.uid" class="div-asset">
+            <div class="container-slots">
+              <!-- this will loop through the slots of the day -->
+              <template v-for="slot in asset.day.slots">
+                <!-- the key directive is required by vue -->
+                <div :key="slot.uid" class="time-slot">
+                  <!-- if the slot is booked, display a red background, else a green background -->
+                  <div v-if="slot.isBooked" class="time-slot time-slot-booked"></div>
+                  <div v-else class="time-slot-free" @click="bookCourt(asset, slot)"></div>
+                </div>
+              </template>
+              <!-- used to indicate the time of day -->
+              <div class="container-time">
+                <div class="time-delimiter">8</div>
+                <div class="time-delimiter">12</div>
+                <div class="time-delimiter">16</div>
+                <div class="time-delimiter">20</div>
+              </div>
+            </div>
+            <!-- the name of the court -->
+            <p class="asset-name">{{ asset.name }}</p>
+          </div>
+        </template>
+      </div>
+      <div class="container-buttons">
+        <!-- the buttons allow to change the day that is displayed, while the span shows the current date that is shown -->
+        <button @click="searchYesterday()">Yesterday</button>
+        <span @click="searchToday()" class="span-time">{{ time.dayAsString }}, the {{ time.dayAsOrdinal }} of {{ time.monthAsString }}, {{ time.yearAsNumber }}</span>
+        <button @click="searchTomorrow()">Tomorrow</button>
       </div>
     </div>
   </div>
@@ -63,20 +94,53 @@ export default {
       'userData',
       'searchResult',
       'playerFilters',
-      'popularClubs'
+      'popularClubs',
+      'time'
     ])
   },
   methods: {
     selectFilter (filter) {
       // commits the selectFilter function with the payload of the clicked filter in vuex
       store.commit('selectFilter', filter)
+      // required to retrieve today's date
+      store.commit('searchToday')
     },
-    checkAvailability (asset) {
-
+    checkAvailability (club) {
+      var id = club.uid
+      // get the data for that court
+      store.commit('searchClub', id)
+      // display it in the search section
+      store.commit('setFilter')
     },
     searchClub () {
+      // declare the payload variable and commit the mutation
       var id = this.uniqueID
       store.commit('searchClub', id)
+    },
+    bookCourt (asset, slot) {
+      // declare the required variables
+      var docID = this.searchResult.uid
+      var assetID = asset.uid
+      var dayID = this.time.dayAsDate
+      var slotID = slot.uid
+      var userID = this.userData.uid
+      // change the boolen isBooked to true and add the current user as the player
+      db.collection('users').doc(docID).collection('assets').doc(assetID).collection('calendar').doc(dayID).collection('slots').doc(slotID).update({
+        isBooked: true,
+        player: userID
+      })
+    },
+    searchTomorrow () {
+      // calls the searchTomorrow function in the vuex state management
+      this.$store.commit('searchTomorrow')
+    },
+    searchYesterday () {
+      // calls the searchYesterday function in the vuex state management
+      this.$store.commit('searchYesterday')
+    },
+    searchToday () {
+      // calls the searchToday function in the vuex state management
+      this.$store.commit('searchToday')
     }
   }
 }
@@ -164,9 +228,75 @@ button {
   font-size: 1.2em;
   font-weight: 600;
 }
+.container-buttons {
+  position: relative;
+  top: 50px;
+  left: 0;
+  width: 100%;
+}
 .check-availability {
   position: absolute;
   right: 200px;
+}
+.container-assets {
+  width: 80%;
+  margin: 0 10% 0 10%;
+}
+.div-asset {
+  margin: 20px;
+  height: 300px;
+  border-bottom: 2px solid black;
+}
+.asset-name {
+  display: inline-block;
+  float: left;
+  margin-left: 40px;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+.container-buttons {
+  position: relative;
+  top: 50px;
+  left: 0;
+  width: 100%;
+}
+.span-time {
+  margin: 0 20px 0 20px;
+  font-size: 1em;
+  font-weight: 600;
+  border-bottom: 2px solid black;
+  padding: 3px 10px 3px 10px;
+}
+/* signal that the span is clickable by changing the shadow and the cursor */
+.span-time:hover {
+  cursor: pointer;
+  box-shadow: 0 4px 2px -2px rgba(0,0,0,0.4);
+  transition: .2s;
+}
+/* create the illusion of pressing the span */
+.span-time:active {
+  box-shadow: none;
+  transition: .2s;
+}
+.container-time {
+  padding-top: 10px;
+}
+.time-delimiter {
+  position: relative;
+  display: inline-block;
+  width: calc(100%/4);
+  font-size: .8em;
+  font-weight: 600;
+}
+.container-slots {
+  position: relative;
+  top: calc(300px - 50px);
+}
+.time-slot {
+  display: inline-block;
+  margin: 3px;
+  height: 50px;
+  width: calc(92.3%/16);
 }
 .time-slot-free {
   position: relative;
@@ -180,12 +310,10 @@ button {
 .time-slot-free:hover {
   cursor: pointer;
   background: rgba(23, 171, 87, 0.9);
-  box-shadow: 2px 2px 1px rgba(0,0,0,0.4);
-  transition: .2s;
+  box-shadow: 2px 2px 2px rgba(0,0,0,0.4);
 }
 .time-slot-free:active {
   box-shadow: none;
-  transition: .2s;
 }
 .time-slot-booked {
   position: relative;

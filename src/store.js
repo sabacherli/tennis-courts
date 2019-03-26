@@ -13,7 +13,8 @@ export default new Vuex.Store({
   // in state, the variables are defined
   state: {
     userData: null,
-    searchResult: null,
+    searchResultAssets: null,
+    searchID: null,
     playerFilters: [
       {
         text: 'Most Popular',
@@ -37,7 +38,10 @@ export default new Vuex.Store({
       dayAsString: null,
       dayAsDate: null
     },
+    unsubscribeEvents: [],
+    unsubscribeSearch: null,
     unsubscribeSlots: null,
+    unsubscribeBookings: null,
     unsubscribeAssets: null
   },
   // mutations are the functions that mutate the state variables
@@ -58,6 +62,16 @@ export default new Vuex.Store({
     setUserDataAssets (state, userDataAssetsArray) {
       for (let asset in userDataAssetsArray) {
         state.userData.assets.push(userDataAssetsArray[asset])
+      }
+    },
+    // empties the userData.bookings array to avoid pushing the same booking into the array if data changes in the back-end
+    emptyUserDataBookings (state) {
+      state.userData.bookings.length = 0
+    },
+    // pushes each booking into the userData.bookings array
+    setUserDataBookings (state, userDataBookingsArray) {
+      for (let booking in userDataBookingsArray) {
+        state.userData.bookings.push(userDataBookingsArray[booking])
       }
     },
     // sets all filters as false before setting the clicked filter as true
@@ -84,8 +98,10 @@ export default new Vuex.Store({
     // sets the time of today in different formats
     setToday (state) {
       // unsubscribe from the listener
-      if (state.unsubscribeSlots) {
-        state.unsubscribeSlots()
+      if (state.unsubscribeEvents.length > 0) {
+        for (let func in state.unsubscribeEvents) {
+          state.unsubscribeEvents[func]()
+        }
       }
       // set today as a moment object
       var today = moment()
@@ -95,36 +111,29 @@ export default new Vuex.Store({
       state.time.dayAsNumber = today.format('DD')
       state.time.dayAsOrdinal = today.format('Do')
       state.time.dayAsString = today.format('dddd')
-      state.time.dayAsDate= today.format('YYYYMMDD')
+      state.time.dayAsDate = today.format('YYYYMMDD')
       // get the data for today
       for (let asset in state.userData.assets) {
-        db.collection('users').doc(state.userData.uid).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').where('uid', '==', today.format('YYYYMMDD')).get()
-          .then(function (querySnapshot) {
+        // keep a reference to this listener to stop listenting once no longer needed (saves bandwidth)
+        state.unsubscribeEvents =
+        db.collection('users').doc(state.userID).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').where('day', '==', today.format('YYYYMMDD')).orderBy('slot')
+          .onSnapshot(function (querySnapshot) {
+            // empty the array of day before repopulating it
+            state.searchResultAssets[asset].day = []
+            // get all the documents with a forEach loop
             querySnapshot.forEach(function (doc) {
-              var day = doc.data()
-              // keep a reference to the id of the document to access its subcollections
-              let date = doc.id
-              // get the slots and add them to the empty array called slots in day
-              state.unsubscribeSlots =
-              db.collection('users').doc(state.userData.uid).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').doc(date).collection('slots').orderBy('uid')
-                .onSnapshot(function (querySnapshot) {
-                  day.slots = []
-                  querySnapshot.forEach(function (doc) {
-                    let data = doc.data()
-                    day.slots.push(doc.data())
-                  })
-                  // assign day with the object retrieved
-                  state.userData.assets[asset].day = day
-                })
+              var booking = doc.data()
+              state.userData.assets[asset].day.push(booking)
             })
           })
       }
     },
-    // sets the time of today in different formats
     searchToday (state) {
       // unsubscribe from the listener
-      if (state.unsubscribeSlots) {
-        state.unsubscribeSlots()
+      if (state.unsubscribeEvents.length > 0) {
+        for (let func in state.unsubscribeEvents) {
+          state.unsubscribeEvents[func]()
+        }
       }
       // set today as a moment object
       var today = moment()
@@ -134,36 +143,29 @@ export default new Vuex.Store({
       state.time.dayAsNumber = today.format('DD')
       state.time.dayAsOrdinal = today.format('Do')
       state.time.dayAsString = today.format('dddd')
-      state.time.dayAsDate= today.format('YYYYMMDD')
+      state.time.dayAsDate = today.format('YYYYMMDD')
       // get the data for today
-      for (let asset in state.searchResult.assets) {
-        db.collection('users').doc(state.searchResult.uid).collection('assets').doc(state.searchResult.assets[asset].uid).collection('calendar').where('uid', '==', today.format('YYYYMMDD')).get()
-          .then(function (querySnapshot) {
+      for (let asset in state.searchResultAssets) {
+        // keep a reference to this listener to stop listenting once no longer needed (saves bandwidth)
+        state.unsubscribeEvents =
+        db.collection('users').doc(state.searchID).collection('assets').doc(state.searchResultAssets[asset].uid).collection('calendar').where('day', '==', today.format('YYYYMMDD')).orderBy('slot')
+          .onSnapshot(function (querySnapshot) {
+            // empty the array of day before repopulating it
+            state.searchResultAssets[asset].day = []
+            // get all the documents with a forEach loop
             querySnapshot.forEach(function (doc) {
-              var day = doc.data()
-              // keep a reference to the id of the document to access its subcollections
-              let date = doc.id
-              // get the slots and add them to the empty array called slots in day
-              state.unsubscribeSlots =
-              db.collection('users').doc(state.searchResult.uid).collection('assets').doc(state.searchResult.assets[asset].uid).collection('calendar').doc(date).collection('slots').orderBy('uid')
-                .onSnapshot(function (querySnapshot) {
-                  day.slots = []
-                  querySnapshot.forEach(function (doc) {
-                    let data = doc.data()
-                    day.slots.push(doc.data())
-                  })
-                  // assign day with the object retrieved
-                  state.searchResult.assets[asset].day = day
-                })
+              var booking = doc.data()
+              state.searchResultAssets[asset].day.push(booking)
             })
           })
       }
     },
-    // sets the time of tomorrow in different formats
     setTomorrow (state) {
       // unsubscribe from the listener
-      if (state.unsubscribeSlots) {
-        state.unsubscribeSlots()
+      if (state.unsubscribeEvents.length > 0) {
+        for (let func in state.unsubscribeEvents) {
+          state.unsubscribeEvents[func]()
+        }
       }
       // add 1 day to state.now (this will increase state.now by one, so clicking on tomorrow again will work)
       var tomorrow = state.now.add(1, 'd')
@@ -173,36 +175,29 @@ export default new Vuex.Store({
       state.time.dayAsNumber = tomorrow.format('DD')
       state.time.dayAsOrdinal = tomorrow.format('Do')
       state.time.dayAsString = tomorrow.format('dddd')
-      state.time.dayAsDate= tomorrow.format('YYYYMMDD')
+      state.time.dayAsDate = tomorrow.format('YYYYMMDD')
       // get the data for tomorrow
       for (let asset in state.userData.assets) {
-        db.collection('users').doc(state.userData.uid).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').where('uid', '==', tomorrow.format('YYYYMMDD')).get()
-          .then(function (querySnapshot) {
+        // keep a reference to this listener to stop listenting once no longer needed (saves bandwidth)
+        state.unsubscribeEvents =
+        db.collection('users').doc(state.userID).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').where('day', '==', tomorrow.format('YYYYMMDD')).orderBy('slot')
+          .onSnapshot(function (querySnapshot) {
+            // empty the array of day before repopulating it
+            state.searchResultAssets[asset].day = []
+            // get all the documents with a forEach loop
             querySnapshot.forEach(function (doc) {
-              var day = doc.data()
-              // keep a reference to the id of the document to access its subcollections
-              let date = doc.id
-              // get the slots and add them to the empty array called slots in day
-              state.unsubscribeSlots =
-              db.collection('users').doc(state.userData.uid).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').doc(date).collection('slots').orderBy('uid')
-                .onSnapshot(function (querySnapshot) {
-                  day.slots = []
-                  querySnapshot.forEach(function (doc) {
-                    let data = doc.data()
-                    day.slots.push(doc.data())
-                  })
-                  // assign day with the object retrieved
-                  state.userData.assets[asset].day = day
-                })
+              var booking = doc.data()
+              state.userData.assets[asset].day.push(booking)
             })
           })
       }
     },
-    // sets the time of tomorrow in different formats
     searchTomorrow (state) {
       // unsubscribe from the listener
-      if (state.unsubscribeSlots) {
-        state.unsubscribeSlots()
+      if (state.unsubscribeEvents.length > 0) {
+        for (let func in state.unsubscribeEvents) {
+          state.unsubscribeEvents[func]()
+        }
       }
       // add 1 day to state.now (this will increase state.now by one, so clicking on tomorrow again will work)
       var tomorrow = state.now.add(1, 'd')
@@ -212,36 +207,29 @@ export default new Vuex.Store({
       state.time.dayAsNumber = tomorrow.format('DD')
       state.time.dayAsOrdinal = tomorrow.format('Do')
       state.time.dayAsString = tomorrow.format('dddd')
-      state.time.dayAsDate= tomorrow.format('YYYYMMDD')
+      state.time.dayAsDate = tomorrow.format('YYYYMMDD')
       // get the data for tomorrow
-      for (let asset in state.searchResult.assets) {
-        db.collection('users').doc(state.searchResult.uid).collection('assets').doc(state.searchResult.assets[asset].uid).collection('calendar').where('uid', '==', tomorrow.format('YYYYMMDD')).get()
-          .then(function (querySnapshot) {
+      for (let asset in state.searchResultAssets) {
+        // keep a reference to this listener to stop listenting once no longer needed (saves bandwidth)
+        state.unsubscribeEvents =
+        db.collection('users').doc(state.searchID).collection('assets').doc(state.searchResultAssets[asset].uid).collection('calendar').where('day', '==', tomorrow.format('YYYYMMDD')).orderBy('slot')
+          .onSnapshot(function (querySnapshot) {
+            // empty the array of day before repopulating it
+            state.searchResultAssets[asset].day = []
+            // get all the documents with a forEach loop
             querySnapshot.forEach(function (doc) {
-              var day = doc.data()
-              // keep a reference to the id of the document to access its subcollections
-              let date = doc.id
-              // get the slots and add them to the empty array called slots in day
-              state.unsubscribeSlots =
-              db.collection('users').doc(state.searchResult.uid).collection('assets').doc(state.searchResult.assets[asset].uid).collection('calendar').doc(date).collection('slots').orderBy('uid')
-                .onSnapshot(function (querySnapshot) {
-                  day.slots = []
-                  querySnapshot.forEach(function (doc) {
-                    let data = doc.data()
-                    day.slots.push(doc.data())
-                  })
-                  // assign day with the object retrieved
-                  state.searchResult.assets[asset].day = day
-                })
+              var booking = doc.data()
+              state.searchResultAssets[asset].day.push(booking)
             })
           })
       }
     },
-    // sets the time of yesterday in different formats
     setYesterday (state) {
       // unsubscribe from the listener
-      if (state.unsubscribeSlots) {
-        state.unsubscribeSlots()
+      if (state.unsubscribeEvents.length > 0) {
+        for (let func in state.unsubscribeEvents) {
+          state.unsubscribeEvents[func]()
+        }
       }
       // subtract 1 day to state.now (this will decrease state.now by one, so clicking on yesterday again will work)
       var yesterday = state.now.subtract(1, 'd')
@@ -251,36 +239,29 @@ export default new Vuex.Store({
       state.time.dayAsNumber = yesterday.format('DD')
       state.time.dayAsOrdinal = yesterday.format('Do')
       state.time.dayAsString = yesterday.format('dddd')
-      state.time.dayAsDate= yesterday.format('YYYYMMDD')
+      state.time.dayAsDate = yesterday.format('YYYYMMDD')
       // get the data for yesterday
       for (let asset in state.userData.assets) {
-        db.collection('users').doc(state.userData.uid).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').where('uid', '==', yesterday.format('YYYYMMDD')).get()
-          .then(function (querySnapshot) {
+        // keep a reference to this listener to stop listenting once no longer needed (saves bandwidth)
+        state.unsubscribeEvents =
+        db.collection('users').doc(state.userID).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').where('day', '==', yesterday.format('YYYYMMDD')).orderBy('slot')
+          .onSnapshot(function (querySnapshot) {
+            // empty the array of day before repopulating it
+            state.searchResultAssets[asset].day = []
+            // get all the documents with a forEach loop
             querySnapshot.forEach(function (doc) {
-              var day = doc.data()
-              // keep a reference to the id of the document to access its subcollections
-              let date = doc.id
-              // get the slots and add them to the empty array called slots in day
-              state.unsubscribeSlots =
-              db.collection('users').doc(state.userData.uid).collection('assets').doc(state.userData.assets[asset].uid).collection('calendar').doc(date).collection('slots').orderBy('uid')
-                .onSnapshot(function (querySnapshot) {
-                  day.slots = []
-                  querySnapshot.forEach(function (doc) {
-                    let data = doc.data()
-                    day.slots.push(doc.data())
-                  })
-                  // assign day with the object retrieved
-                  state.userData.assets[asset].day = day
-                })
+              var booking = doc.data()
+              state.userData.assets[asset].day.push(booking)
             })
           })
       }
     },
-    // sets the time of yesterday in different formats
     searchYesterday (state) {
       // unsubscribe from the listener
-      if (state.unsubscribeSlots) {
-        state.unsubscribeSlots()
+      if (state.unsubscribeEvents.length > 0) {
+        for (let func in state.unsubscribeEvents) {
+          state.unsubscribeEvents[func]()
+        }
       }
       // subtract 1 day to state.now (this will decrease state.now by one, so clicking on yesterday again will work)
       var yesterday = state.now.subtract(1, 'd')
@@ -290,27 +271,19 @@ export default new Vuex.Store({
       state.time.dayAsNumber = yesterday.format('DD')
       state.time.dayAsOrdinal = yesterday.format('Do')
       state.time.dayAsString = yesterday.format('dddd')
-      state.time.dayAsDate= yesterday.format('YYYYMMDD')
+      state.time.dayAsDate = yesterday.format('YYYYMMDD')
       // get the data for yesterday
-      for (let asset in state.searchResult.assets) {
-        db.collection('users').doc(state.searchResult.uid).collection('assets').doc(state.searchResult.assets[asset].uid).collection('calendar').where('uid', '==', yesterday.format('YYYYMMDD')).get()
-          .then(function (querySnapshot) {
+      for (let asset in state.searchResultAssets) {
+        // keep a reference to this listener to stop listenting once no longer needed (saves bandwidth)
+        state.unsubscribeEvents =
+        db.collection('users').doc(state.searchID).collection('assets').doc(state.searchResultAssets[asset].uid).collection('calendar').where('day', '==', yesterday.format('YYYYMMDD')).orderBy('slot')
+          .onSnapshot(function (querySnapshot) {
+            // empty the array of day before repopulating it
+            state.searchResultAssets[asset].day = []
+            // get all the documents with a forEach loop
             querySnapshot.forEach(function (doc) {
-              var day = doc.data()
-              // keep a reference to the id of the document to access its subcollections
-              let date = doc.id
-              // get the slots and add them to the empty array called slots in day
-              state.unsubscribeSlots =
-              db.collection('users').doc(state.searchResult.uid).collection('assets').doc(state.searchResult.assets[asset].uid).collection('calendar').doc(date).collection('slots').orderBy('uid')
-                .onSnapshot(function (querySnapshot) {
-                  day.slots = []
-                  querySnapshot.forEach(function (doc) {
-                    let data = doc.data()
-                    day.slots.push(doc.data())
-                  })
-                  // assign day with the object retrieved
-                  state.searchResult.assets[asset].day = day
-                })
+              var booking = doc.data()
+              state.searchResultAssets[asset].day.push(booking)
             })
           })
       }
@@ -329,15 +302,10 @@ export default new Vuex.Store({
         })
     },
     searchClub (state, id) {
-      // unsubscribe from the listeners
-      if (state.unsubscribeSlots) {
-        state.unsubscribeSlots()
-      }
-      if (state.unsubscribeAssets) {
-        state.unsubscribeAssets()
-      }
-      //
+      // set today as a date variable
       var today = moment()
+      state.searchID = id
+      // set the variations of today
       state.time.yearAsNumber = today.format('YYYY')
       state.time.monthAsNumber = today.format('MM')
       state.time.monthAsString = today.format('MMMM')
@@ -345,70 +313,36 @@ export default new Vuex.Store({
       state.time.dayAsOrdinal = today.format('Do')
       state.time.dayAsString = today.format('dddd')
       state.time.dayAsDate = today.format('YYYYMMDD')
-      // get the data based on the id that was searched
-      db.collection('users').doc(id).get()
-        .then(function (doc) {
-          state.searchResult = doc.data()
-          // keep this reference as well
-          state.unsubscribeAssets =
-          db.collection('users').doc(id).collection('assets').orderBy('name')
-            .onSnapshot(function (querySnapshot) {
-              // empty the array of assets before repopulating it
-              state.searchResult.assets = []
-              // define an empty array that we can fill
-              var searchResultAssetsArray = []
-              // get all the documents with a forEach loop
-              querySnapshot.forEach(function (doc) {
-                let data = doc.data()
-                searchResultAssetsArray.push(data)
+      // get the data
+      state.unsubscribeSearch =
+      db.collection('users').doc(id).collection('assets').orderBy('name')
+        .onSnapshot(function (querySnapshot) {
+          // empty the array of assets before repopulating it
+          state.searchResultAssets = []
+          // define an empty array that we can fill
+          var searchResultAssetsArray = []
+          // get all the documents with a forEach loop
+          querySnapshot.forEach(function (doc) {
+            let data = doc.data()
+            searchResultAssetsArray.push(data)
+          })
+          // push all assets into vuex state management
+          for (let asset in searchResultAssetsArray) {
+            // keep a reference to this listener to stop listenting once no longer needed (saves bandwidth)
+            state.unsubscribeEvents[asset] =
+            db.collection('users').doc(id).collection('assets').doc(searchResultAssetsArray[asset].uid).collection('calendar').where('day', '==', today.format('YYYYMMDD')).orderBy('slot')
+              .onSnapshot(function (querySnapshot) {
+                // empty the array of day before repopulating it
+                searchResultAssetsArray[asset].day = []
+                // get all the documents with a forEach loop
+                querySnapshot.forEach(function (doc) {
+                  var booking = doc.data()
+                  searchResultAssetsArray[asset].day.push(booking)
+                })
               })
-              // push all assets into vuex state management
-              for (let asset in searchResultAssetsArray) {
-                state.searchResult.assets.push(searchResultAssetsArray[asset])
-                // get the data for yesterday
-                db.collection('users').doc(id).collection('assets').doc(searchResultAssetsArray[asset].uid).collection('calendar').where('uid', '==', today.format('YYYYMMDD')).get()
-                  .then(function (querySnapshot) {
-                    querySnapshot.forEach(function (doc) {
-                      var day = doc.data()
-                      // keep a reference to the id of the document to access its subcollections
-                      let date = doc.id
-                      // get the slots and add them to the empty array called slots in day
-                      state.unsubscribeSlots =
-                      db.collection('users').doc(id).collection('assets').doc(searchResultAssetsArray[asset].uid).collection('calendar').doc(date).collection('slots').orderBy('uid')
-                        .onSnapshot(function (querySnapshot) {
-                          querySnapshot.forEach(function (doc) {
-                            let data = doc.data()
-                            day.slots.push(doc.data())
-                          })
-                          // assign day with the object retrieved
-                          state.searchResult.assets[asset].day = day
-                          for (let asset in state.searchResult.assets) {
-                            db.collection('users').doc(state.searchResult.uid).collection('assets').doc(state.searchResult.assets[asset].uid).collection('calendar').where('uid', '==', today.format('YYYYMMDD')).get()
-                              .then(function (querySnapshot) {
-                                querySnapshot.forEach(function (doc) {
-                                  var day = doc.data()
-                                  // keep a reference to the id of the document to access its subcollections
-                                  let date = doc.id
-                                  // get the slots and add them to the empty array called slots in day
-                                  state.unsubscribeSlots =
-                                  db.collection('users').doc(state.searchResult.uid).collection('assets').doc(state.searchResult.assets[asset].uid).collection('calendar').doc(date).collection('slots').orderBy('uid')
-                                    .onSnapshot(function (querySnapshot) {
-                                      day.slots = []
-                                      querySnapshot.forEach(function (doc) {
-                                        let data = doc.data()
-                                        day.slots.push(doc.data())
-                                      })
-                                      // assign day with the object retrieved
-                                      state.searchResult.assets[asset].day = day
-                                    })
-                                })
-                              })
-                          }
-                        })
-                    })
-                  })
-              }
-            })
+            // push the data into searchResultAssets
+            state.searchResultAssets.push(searchResultAssetsArray[asset])
+          }
         })
     }
   }

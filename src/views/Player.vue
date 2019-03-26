@@ -37,7 +37,8 @@ export default {
           db.collection('users').doc(user.user.uid).set({
             email: user.user.email,
             uid: user.user.uid,
-            role: 'Player'
+            role: 'Player',
+            bookings: []
           })
           router.push('dashboard')
         })

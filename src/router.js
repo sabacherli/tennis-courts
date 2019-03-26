@@ -32,6 +32,14 @@ export default new Router({
       }
     },
     {
+      path: '/bookings',
+      name: 'Bookings',
+      components: {
+        dropdown: () => import(/* webpackChunkName: "dropdown" */ './components/Dropdown.vue'),
+        default: () => import(/* webpackChunkName: "bookings" */ './views/Bookings.vue')
+      }
+    },
+    {
       path: '/dashboard',
       name: 'Dashboard',
       components: {

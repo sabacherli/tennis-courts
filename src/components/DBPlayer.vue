@@ -33,29 +33,23 @@
         <br>
         <button type="button" @click="searchClub()">Search</button>
       </form>
-      <!-- if the searchResult is not null, then show the following div -->
-      <div v-if="searchResult" class="container-assets">
+      <div class="container-assets">
         <!-- this template is displayed for all assets in userData.assets -->
-        <template v-for="asset in searchResult.assets">
+        <template v-for="asset in searchResultAssets">
           <!-- the key directive is required by vue -->
           <div :key="asset.uid" class="div-asset">
             <div class="container-slots">
               <!-- this will loop through the slots of the day -->
-              <template v-for="slot in asset.day.slots">
+              <template v-for="slot in 16">
                 <!-- the key directive is required by vue -->
-                <div :key="slot.uid" class="time-slot">
+                <div :key="slot" class="time-slot">
                   <!-- if the slot is booked, display a red background, else a green background -->
-                  <div v-if="slot.isBooked" class="time-slot time-slot-booked"></div>
+                  <div v-if="asset.day.some(e => e.slot === slot + 5)" class="time-slot-booked"></div>
                   <div v-else class="time-slot-free" @click="bookCourt(asset, slot)"></div>
+                  <div class="time-delimiter">{{ slot + 5 }}h</div>
                 </div>
               </template>
-              <!-- used to indicate the time of day -->
-              <div class="container-time">
-                <div class="time-delimiter">8</div>
-                <div class="time-delimiter">12</div>
-                <div class="time-delimiter">16</div>
-                <div class="time-delimiter">20</div>
-              </div>
+
             </div>
             <!-- the name of the court -->
             <p class="asset-name">{{ asset.name }}</p>
@@ -75,6 +69,8 @@
 <script>
 // required to read the computed values
 import { mapState } from 'vuex'
+// moment is a third-party package used to easily handle date and time in javascript
+import moment from 'moment'
 // required to interact with the database
 import db from '@/database.js'
 // requred to call commit from within firebase callback
@@ -92,7 +88,8 @@ export default {
   computed: {
     ...mapState([
       'userData',
-      'searchResult',
+      'searchResultAssets',
+      'searchID',
       'playerFilters',
       'popularClubs',
       'time'
@@ -119,15 +116,31 @@ export default {
     },
     bookCourt (asset, slot) {
       // declare the required variables
-      var docID = this.searchResult.uid
+      var docID = this.searchID
       var assetID = asset.uid
+      var assetName = asset.name
       var dayID = this.time.dayAsDate
-      var slotID = slot.uid
+      var monthID = this.time.monthAsNumber
+      var slotID = slot + 5
       var userID = this.userData.uid
       // change the boolen isBooked to true and add the current user as the player
-      db.collection('users').doc(docID).collection('assets').doc(assetID).collection('calendar').doc(dayID).collection('slots').doc(slotID).update({
+      db.collection('users').doc(docID).collection('assets').doc(assetID).collection('calendar').doc(dayID + slotID).set({
         isBooked: true,
-        player: userID
+        player: userID,
+        month: monthID,
+        day: dayID,
+        slot: Number(slotID),
+        uid: dayID + slotID,
+        asset: assetID
+      })
+      // add booking to user's bookings collection
+      db.collection('users').doc(userID).collection('bookings').doc(dayID + slotID).set({
+        court: assetName,
+        date: moment(dayID, 'YYYYMMDD').format('MMMM Do YYYY'),
+        time: Number(slotID),
+        uid: dayID,
+        doc: docID,
+        asset: assetID
       })
     },
     searchTomorrow () {
@@ -284,7 +297,7 @@ button {
 .time-delimiter {
   position: relative;
   display: inline-block;
-  width: calc(100%/4);
+  margin-top: 10px;
   font-size: .8em;
   font-weight: 600;
 }
@@ -296,7 +309,7 @@ button {
   display: inline-block;
   margin: 3px;
   height: 50px;
-  width: calc(92.3%/16);
+  width: calc(90%/16);
 }
 .time-slot-free {
   position: relative;
@@ -320,7 +333,7 @@ button {
   bottom: 3px;
   height: 50px;
   width: 100%;
-  background: rgba(221, 118, 43, 0.78);
+  background: rgb(176, 43, 43);
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }

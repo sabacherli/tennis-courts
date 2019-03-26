@@ -5,11 +5,14 @@
     <!-- the container that is shifted off the screen at the beginning, which is then moved to left: 0 once the icon is hovered -->
     <div id="dropdown-nav" class="dropdown-nav">
       <!-- navigate to the personal dashboard if the user is logged in -->
-      <span v-if="userData !== null" id="register" class="dropdown-item" @click='goDashboard()'>DASHBOARD</span>
+      <span v-if="userData !== null" id="dashboard" class="dropdown-item" @click='goDashboard()'>DASHBOARD</span>
       <!-- be able to navigate to the registration process if the user is not logged in -->
-      <span v-if="userData === null" id="register" class="dropdown-item" @click='goRegister()'>HOME</span>
+      <span v-if="userData === null" id="register" class="dropdown-item" @click='goRegister()'>REGISTER</span>
       <!-- short line in between the menu options -->
       <div class="dropdown-item-break"></div>
+      <span v-if="userData !== null" id="bookings" class="dropdown-item" @click='goBookings()'>BOOKINGS</span>
+      <!-- short line in between the menu options -->
+      <div v-if="userData !== null" class="dropdown-item-break"></div>
       <!-- show the logout option if the user is logged in -->
       <span v-if="userData !== null" id="logout" class="dropdown-item" @click='logout()'>LOGOUT</span>
       <!-- show the login option if the user is not logged in -->
@@ -39,6 +42,9 @@ export default {
     },
     goRegister () {
       router.push('/')
+    },
+    goBookings () {
+      router.push('bookings')
     },
     goLogin () {
       router.push('login')

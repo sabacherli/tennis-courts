@@ -7,6 +7,8 @@
 
 <script type="text/javascript">
 import { mapState } from 'vuex'
+// moment is a third-party package used to easily handle date and time in javascript
+import moment from 'moment'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import db from '@/database.js'
@@ -16,10 +18,12 @@ export default {
     // define the variables
     var unsubscribe
     var unsubscribeAssets
+    var unsubscribeBookings
     // if the variable has already been assigned a callback to unsubscribe, then unsubscribe from the listener
     if (unsubscribe) {
       unsubscribe()
       unsubscribeAssets()
+      unsubscribeBookings()
     }
     // set the time of today in different formats
     store.commit('setTime')
@@ -50,6 +54,22 @@ export default {
                 // push all assets into vuex state management
                 store.commit('setUserDataAssets', userDataAssetsArray)
               })
+            // keep this reference as well
+            unsubscribeBookings =
+            db.collection('users').doc(userID).collection('bookings').where('uid', '>=', moment().format('YYYYMMDD'))
+              .onSnapshot(function (querySnapshot) {
+                // empty the array of assets before repopulating it
+                store.commit('emptyUserDataBookings')
+                // define an empty array that we can fill
+                let userDataBookingsArray = []
+                // get all the documents with a forEach loop
+                querySnapshot.forEach(function (doc) {
+                  let data = doc.data()
+                  userDataBookingsArray.push(data)
+                })
+                // push all assets into vuex state management
+                store.commit('setUserDataBookings', userDataBookingsArray)
+              })
           })
       } else {
         // unsubscribe from all the listeners to save bandwidth
@@ -57,6 +77,7 @@ export default {
         if (unsubscribe) {
           unsubscribe()
           unsubscribeAssets()
+          unsubscribeBookings()
         }
         // remove the userData
         store.commit('emptyUserData')

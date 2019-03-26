@@ -11,6 +11,8 @@
       <!-- or when pressing the button -->
       <button type="button" @click="addCourt()">Add Court</button>
     </form>
+    <p class="instruction" style="margin-top: 160px; margin-bottom: -60px">An overview of the vacancy of your courts.</p>
+    <div v-if="userData.courts === 0" style="margin-bottom: 60px"></div>
     <div class="container-assets">
       <!-- this template is displayed for all assets in userData.assets -->
       <template v-for="asset in userData.assets">
@@ -22,7 +24,7 @@
               <!-- the key directive is required by vue -->
               <div :key="slot.uid" class="time-slot">
                 <!-- if the slot is booked, display a red background, else a green background -->
-                <div v-if="slot.isBooked" class="time-slot time-slot-booked"></div>
+                <div v-if="slot.isBooked" class="time-slot-booked"></div>
                 <div v-else class="time-slot-free"></div>
               </div>
             </template>
@@ -62,7 +64,7 @@ export default {
       courtName: null
     }
   },
-  created () {
+  updated () {
     this.$store.commit('setToday')
   },
   computed: {
@@ -82,7 +84,7 @@ export default {
       // creates a new document in the assets collection with the name and an empty unique ID of the court
       db.collection('users').doc(userData.uid).collection('assets').add({
         name: courtName,
-        day: null,
+        day: [],
         uid: null
       })
         // updates the unique ID with the id of the document firebase created
@@ -105,7 +107,7 @@ export default {
                 for (let h = 6; h < 22; h++) {
                   const hour = JSON.stringify(h)
                   db.collection('users').doc(userData.uid).collection('assets').doc(doc.id).collection('calendar').doc(day).collection('slots').doc(hour).set({
-                    uid: hour,
+                    uid: h,
                     isBooked: false,
                     player: null
                   })
@@ -236,7 +238,7 @@ button {
   display: inline-block;
   margin: 3px;
   height: 50px;
-  width: calc(92.3%/16);
+  width: calc(90%/16);
 }
 .time-slot-free {
   position: relative;
@@ -252,7 +254,7 @@ button {
   bottom: 3px;
   height: 50px;
   width: 100%;
-  background: rgba(221, 118, 43, 0.78);
+  background: rgb(176, 43, 43);
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }

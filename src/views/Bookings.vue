@@ -9,7 +9,7 @@
       </div>
       <!-- show the search field if a player is logged in -->
       <div v-if="userData.role === 'Player'">
-        <h2>See you booked courts</h2>
+        <h2>See your booked courts</h2>
         <BPlayer></BPlayer>
       </div>
     </div>

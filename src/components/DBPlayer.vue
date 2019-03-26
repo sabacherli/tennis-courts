@@ -49,7 +49,6 @@
                   <div class="time-delimiter">{{ slot + 5 }}h</div>
                 </div>
               </template>
-
             </div>
             <!-- the name of the court -->
             <p class="asset-name">{{ asset.name }}</p>

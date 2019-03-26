@@ -20,21 +20,15 @@
         <div :key="asset.uid" class="div-asset">
           <div class="container-slots">
             <!-- this will loop through the slots of the day -->
-            <template v-for="slot in asset.day.slots">
+            <template v-for="slot in 16">
               <!-- the key directive is required by vue -->
-              <div :key="slot.uid" class="time-slot">
+              <div :key="slot" class="time-slot">
                 <!-- if the slot is booked, display a red background, else a green background -->
-                <div v-if="slot.isBooked" class="time-slot-booked"></div>
-                <div v-else class="time-slot-free"></div>
+                <div v-if="asset.day.some(e => e.slot === slot + 5)" class="time-slot-booked"></div>
+                <div v-else class="time-slot-free" @click="bookCourt(asset, slot)"></div>
+                <div class="time-delimiter">{{ slot + 5 }}h</div>
               </div>
             </template>
-            <!-- used to indicate the time of day -->
-            <div class="container-time">
-              <div class="time-delimiter">8</div>
-              <div class="time-delimiter">12</div>
-              <div class="time-delimiter">16</div>
-              <div class="time-delimiter">20</div>
-            </div>
           </div>
           <!-- the name of the court -->
           <p class="asset-name">{{ asset.name }}</p>
@@ -55,8 +49,8 @@
 import { mapState } from 'vuex'
 // required to interact with the database
 import db from '@/database.js'
-// moment is a third-party package used to easily handle date and time in javascript
-import moment from 'moment'
+// required to call commit inside another function
+import store from '../store'
 export default {
   name: 'DBOwner',
   data () {
@@ -64,8 +58,10 @@ export default {
       courtName: null
     }
   },
-  updated () {
-    this.$store.commit('setToday')
+  created () {
+    setTimeout(function () {
+      store.commit('setToday')
+    }, 500)
   },
   computed: {
     ...mapState([
@@ -92,28 +88,6 @@ export default {
           db.collection('users').doc(userData.uid).collection('assets').doc(doc.id).update({
             uid: doc.id
           })
-          // adds the days of the month to the calendar in the database
-          const year = moment().format('YYYY')
-          const month = moment().format('MM')
-          const days = moment().daysInMonth()
-          for (let d = 0; d < days; d++) {
-            const day = moment().year(year).month(month).subtract(1, 'M').startOf('month').add(d, 'day').format('YYYYMMDD')
-            db.collection('users').doc(userData.uid).collection('assets').doc(doc.id).collection('calendar').doc(day).set({
-              uid: day,
-              slots: []
-            })
-              .then(function () {
-                // for each day it adds the different time slots to the day
-                for (let h = 6; h < 22; h++) {
-                  const hour = JSON.stringify(h)
-                  db.collection('users').doc(userData.uid).collection('assets').doc(doc.id).collection('calendar').doc(day).collection('slots').doc(hour).set({
-                    uid: h,
-                    isBooked: false,
-                    player: null
-                  })
-                }
-              })
-          }
         })
       // resets the court name
       this.courtName = null
@@ -226,7 +200,7 @@ button {
 .time-delimiter {
   position: relative;
   display: inline-block;
-  width: calc(100%/4);
+  margin-top: 10px;
   font-size: .8em;
   font-weight: 600;
 }

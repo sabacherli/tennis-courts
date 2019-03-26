@@ -40,24 +40,17 @@ export default {
     deleteCourt (asset) {
       var assetID = asset.uid
       var userData = this.userData
-      db.collection('users').doc(userData.uid).collection('assets').doc(assetID).collection('calendar').get()
-        .then(function (querySnapshot) {
-          querySnapshot.forEach(function (doc) {
-            var dayID = doc.id
-            db.collection('users').doc(userData.uid).collection('assets').doc(assetID).collection('calendar').doc(dayID).collection('slots').get()
-              .then(function (querySnapshot) {
-                querySnapshot.forEach(function (doc) {
-                  var slotID = doc.id
-                  db.collection('users').doc(userData.uid).collection('assets').doc(assetID).collection('calendar').doc(dayID).collection('slots').doc(slotID).delete()
-                })
-              })
-            db.collection('users').doc(userData.uid).collection('assets').doc(assetID).collection('calendar').doc(dayID).delete()
-          })
-        })
-      db.collection('users').doc(userData.uid).collection('assets').doc(assetID).delete()
       db.collection('users').doc(userData.uid).update({
         courts: Number(userData.courts) - 1
       })
+      db.collection('users').doc(userData.uid).collection('assets').doc(assetID).collection('calendar').get()
+        .then(function (querySnapshot) {
+          querySnapshot.forEach(function (doc) {
+            var docID = doc.id
+            db.collection('users').doc(userData.uid).collection('assets').doc(assetID).collection('calendar').doc(docID).delete()
+          })
+        })
+      db.collection('users').doc(userData.uid).collection('assets').doc(assetID).delete()
     }
   }
 }

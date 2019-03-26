@@ -134,11 +134,12 @@ export default {
         asset: assetID
       })
       // add booking to user's bookings collection
-      db.collection('users').doc(userID).collection('bookings').doc(dayID + slotID).set({
+      db.collection('users').doc(userID).collection('bookings').doc(dayID + slotID + assetName).set({
         court: assetName,
         date: moment(dayID, 'YYYYMMDD').format('MMMM Do YYYY'),
         time: Number(slotID),
-        uid: dayID,
+        day: dayID,
+        uid: dayID + slotID + assetName,
         doc: docID,
         asset: assetID
       })

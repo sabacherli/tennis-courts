@@ -56,7 +56,7 @@ export default {
               })
             // keep this reference as well
             unsubscribeBookings =
-            db.collection('users').doc(userID).collection('bookings').where('uid', '>=', moment().format('YYYYMMDD'))
+            db.collection('users').doc(userID).collection('bookings').where('uid', '>=', moment().format('YYYYMMDD')).orderBy('uid')
               .onSnapshot(function (querySnapshot) {
                 // empty the array of assets before repopulating it
                 store.commit('emptyUserDataBookings')

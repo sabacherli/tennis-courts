@@ -42,16 +42,13 @@ export default {
       // declare the required variables
       var docID = booking.doc
       var assetID = booking.asset
-      var dayID = booking.uid
-      var slotID = booking.time.toString()
       var userID = this.userData.uid
-      // change the boolen isBooked to false and remove the player
-      db.collection('users').doc(docID).collection('assets').doc(assetID).collection('calendar').doc(dayID).collection('slots').doc(slotID).update({
-        isBooked: false,
-        player: null
-      })
+      var bookingID = booking.uid
+      var eventID = booking.day + booking.time
+      // remove booking to owners's calendar collection
+      db.collection('users').doc(docID).collection('assets').doc(assetID).collection('calendar').doc(eventID).delete()
       // remove booking to user's bookings collection
-      db.collection('users').doc(userID).collection('bookings').doc(dayID + slotID).delete()
+      db.collection('users').doc(userID).collection('bookings').doc(bookingID).delete()
     }
   }
 }

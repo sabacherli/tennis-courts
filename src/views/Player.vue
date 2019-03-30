@@ -6,7 +6,7 @@
       <form method="post">
         <input type="email" v-model="email" placeholder="Email" autocomplete="email" required>
         <br>
-        <input type="password" v-model="password" placeholder="Password" autocomplete="current-password" @keyup.enter="createUser()" required>
+        <input type="password" v-model="password" placeholder="Password" autocomplete="current-password" @keyup.enter="createPlayer()" required>
         <br>
         <button type="button" @click="createPlayer()">Register</button>
       </form>
@@ -15,9 +15,12 @@
 </template>
 
 <script>
+// required to create a user
 import firebase from 'firebase/app'
 import 'firebase/auth'
+// required to interact with the database
 import db from '@/database.js'
+// required to call router within the function
 import router from '../router.js'
 export default {
   name: 'Player',
@@ -30,35 +33,27 @@ export default {
   created () {
     this.$store.commit('getClubs')
   },
+  // methods are where the functions of a component are listed
   methods: {
     createPlayer () {
+      // creates a new account with email and password and logs in the user
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
         .then(function (user) {
+          // then creates a new document in the users collection
           db.collection('users').doc(user.user.uid).set({
             email: user.user.email,
             uid: user.user.uid,
             role: 'Player',
             bookings: []
           })
+          // changes the page to dashboard page
           router.push('dashboard')
         })
         .catch(function (error) {
-          // Handle Errors here.
+          // Handle Errors here. Log errors to the console with code and message
           var errorCode = error.code
           var errorMessage = error.message
-          console.log(errorCode, ': ', errorMessage)
-        })
-    },
-    login () {
-      firebase.auth().signInWithEmailAndPassword(this.email, this.password)
-        .then(function () {
-          router.push('dashboard')
-        })
-        .catch(function (error) {
-          // Handle Errors here.
-          var errorCode = error.code
-          var errorMessage = error.message
-          console.log(errorCode, ': ', errorMessage)
+          alert(errorCode, ': ', errorMessage)
         })
     }
   }

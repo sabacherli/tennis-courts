@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 Vue.use(Router)
-
+// This file allows the user to switch between pages without refreshing the page. This is required because it is a single page application.
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,

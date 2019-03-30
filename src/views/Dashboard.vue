@@ -2,32 +2,32 @@
   <div>
     <h1>DASHBOARD</h1>
     <div class="container">
-      <!-- show the user's tennis courts if the owner is logged in -->
+      <!-- shows the owner's tennis courts and vacancy of courts if a owner is logged in -->
       <div v-if="userData.role === 'Owner'">
         <h2>Rent out your tennis courts</h2>
-        <DBOwner></DBOwner>
+        <DashboardOwner></DashboardOwner>
       </div>
-      <!-- show the search field if a player is logged in -->
+      <!-- shows the most popular (tennis courts) and search field (for tennis courts) if a player is logged in -->
       <div v-if="userData.role === 'Player'">
         <h2>Book a tennis court</h2>
-        <DBPlayer></DBPlayer>
+        <DashboardPlayer></DashboardPlayer>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-// required to read the computed values
+// required to read the computed values (user data)
 import { mapState } from 'vuex'
 // required to import the vue components
-import DBOwner from '../components/DBOwner.vue'
-import DBPlayer from '../components/DBPlayer.vue'
+import DashboardOwner from '../components/DashboardOwner.vue'
+import DashboardPlayer from '../components/DashboardPlayer.vue'
 export default {
   name: 'Dashboard',
   // required to register the components
   components: {
-    DBOwner,
-    DBPlayer
+    DashboardOwner,
+    DashboardPlayer
   },
   computed: {
     ...mapState([

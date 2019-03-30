@@ -1,3 +1,5 @@
+<!-- This component is for the player dashboard -->
+
 <template lang="html">
   <div class="container-component">
     <div class="container-filters">
@@ -75,7 +77,7 @@ import db from '@/database.js'
 // requred to call commit from within firebase callback
 import store from '../store.js'
 export default {
-  name: 'DBPlayer',
+  name: 'DashboardPlayer',
   data () {
     return {
       uniqueID: null
@@ -94,6 +96,7 @@ export default {
       'time'
     ])
   },
+  // methods are where the functions of a component are listed
   methods: {
     selectFilter (filter) {
       // commits the selectFilter function with the payload of the clicked filter in vuex

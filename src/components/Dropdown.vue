@@ -1,10 +1,12 @@
+<!-- This component is for the menu -->
+
 <template lang="html">
   <div id="container" class="dropdown">
     <!-- icon shown in the top left corner -->
     <img id="dropdown-icon" class="dropdown-icon" src="../assets/icons8-menu-50.png" alt="Menu">
     <!-- the container that is shifted off the screen at the beginning, which is then moved to left: 0 once the icon is hovered -->
     <div id="dropdown-nav" class="dropdown-nav">
-      <!-- navigate to the personal dashboard if the user is logged in -->
+      <!-- navigate to the dashboard if the user is logged in -->
       <span v-if="userData !== null" id="dashboard" class="dropdown-item" @click='goDashboard()'>DASHBOARD</span>
       <!-- be able to navigate to the registration process if the user is not logged in -->
       <span v-if="userData === null" id="register" class="dropdown-item" @click='goRegister()'>REGISTER</span>
@@ -37,6 +39,7 @@ export default {
       'userData'
     ])
   },
+  // methods are where the functions of a component are listed
   methods: {
     goDashboard () {
       router.push('dashboard')

@@ -6,7 +6,7 @@
       <form method="post">
         <input type="email" v-model="email" placeholder="Email" autocomplete="email" required>
         <br>
-        <input type="password" v-model="password" placeholder="Password" autocomplete="current-password" @keyup.enter="createUser()" required>
+        <input type="password" v-model="password" placeholder="Password" autocomplete="current-password" @keyup.enter="createOwner()" required>
         <br>
         <button type="button" @click="createOwner()">Register</button>
       </form>
@@ -30,6 +30,7 @@ export default {
       password: ''
     }
   },
+  // methods are where the functions of a component are listed
   methods: {
     createOwner () {
       // creates a new account with email and password and logs in the user
@@ -43,14 +44,14 @@ export default {
             courts: 0,
             assets: []
           })
-          // changes the page to dashboard
+          // changes the page to dashboard page
           router.push('dashboard')
         })
         .catch(function (error) {
           // log errors to the console with code and message
           var errorCode = error.code
           var errorMessage = error.message
-          console.log(errorCode, ': ', errorMessage)
+          alert(errorCode, ': ', errorMessage)
         })
     }
   }

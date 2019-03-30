@@ -12,6 +12,7 @@
 <script>
 export default {
   name: 'Register',
+  // methods are where the functions of a component are listed
   methods: {
     goOwner () {
       this.$router.push('owner')

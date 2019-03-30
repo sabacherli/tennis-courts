@@ -1,3 +1,5 @@
+<!-- This component is for the player owner -->
+
 <template lang="html">
   <div>
     <!-- this unique ID can be used in the search field to directly find this club -->
@@ -52,7 +54,7 @@ import db from '@/database.js'
 // required to call commit inside another function
 import store from '../store'
 export default {
-  name: 'DBOwner',
+  name: 'DashboardOwner',
   data () {
     return {
       courtName: null
@@ -69,6 +71,7 @@ export default {
       'time'
     ])
   },
+  // methods are where the functions of a component are listed
   methods: {
     addCourt () {
       var userData = this.userData

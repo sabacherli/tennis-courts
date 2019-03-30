@@ -1,16 +1,17 @@
 <template lang="html">
   <div>
-    <h1>BOOKINGS</h1>
+    <h1 v-if="userData.role === 'Owner'">COURTS</h1>
+    <h1 v-if="userData.role === 'Player'">BOOKINGS</h1>
     <div class="container">
-      <!-- show the user's tennis courts if the owner is logged in -->
+      <!-- shows the user's tennis courts if the owner is logged in -->
       <div v-if="userData.role === 'Owner'">
         <h2>Monitor the performance of your courts</h2>
-        <BOwner></BOwner>
+        <BookingsOwner></BookingsOwner>
       </div>
-      <!-- show the search field if a player is logged in -->
+      <!-- shows the booked tennis courts if a player is logged in -->
       <div v-if="userData.role === 'Player'">
         <h2>See your booked courts</h2>
-        <BPlayer></BPlayer>
+        <BookingsPlayer></BookingsPlayer>
       </div>
     </div>
   </div>
@@ -20,14 +21,14 @@
 // required to read the computed values
 import { mapState } from 'vuex'
 // required to import the vue components
-import BOwner from '../components/BOwner.vue'
-import BPlayer from '../components/BPlayer.vue'
+import BookingsOwner from '../components/BookingsOwner.vue'
+import BookingsPlayer from '../components/BookingsPlayer.vue'
 export default {
   name: 'Bookings',
   // required to register the components
   components: {
-    BOwner,
-    BPlayer
+    BookingsOwner,
+    BookingsPlayer
   },
   computed: {
     ...mapState([

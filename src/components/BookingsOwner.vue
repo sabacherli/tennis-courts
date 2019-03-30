@@ -1,16 +1,16 @@
+<!-- This component is for the owner bookings -->
+
 <template lang="html">
   <div class="container-component">
     <!-- if the bookingResult is not null, then show the following div -->
-    <div v-if="userData.bookings" class="container-assets">
+    <div v-if="userData.assets" class="container-assets">
       <!-- this template is displayed for all bookings in userData.bookings -->
-      <template v-for="booking in userData.bookings">
+      <template v-for="asset in userData.assets">
         <!-- the key directive is required by vue -->
-        <div :key="booking.uid" class="div-asset">
+        <div :key="asset.uid" class="div-asset">
           <!-- the name of the court and time of the booking -->
-          <p class="asset-name">{{ booking.date }}</p>
-          <p class="asset-name">{{ booking.court }}</p>
-          <p class="asset-name">{{ booking.time }} - {{ booking.time + 1 }} o'clock</p>
-          <button type="button" @click="cancelBooking(booking)">Cancel</button>
+          <p class="asset-name">{{ asset.name }}</p>
+          <button type="button" @click="deleteCourt(asset)">Delete</button>
         </div>
       </template>
     </div>
@@ -23,7 +23,7 @@ import { mapState } from 'vuex'
 // required to interact with the database
 import db from '@/database.js'
 export default {
-  name: 'BPlayer',
+  name: 'BookingsOwner',
   data () {
     return {
       uniqueID: null
@@ -31,24 +31,29 @@ export default {
   },
   created () {
     this.$store.commit('setTime')
+    this.$store.commit('setToday')
   },
   computed: {
     ...mapState([
       'userData'
     ])
   },
+  // methods are where the functions of a component are listed
   methods: {
-    cancelBooking (booking) {
-      // declare the required variables
-      var docID = booking.doc
-      var assetID = booking.asset
-      var userID = this.userData.uid
-      var bookingID = booking.uid
-      var eventID = booking.day + booking.time
-      // remove booking to owners's calendar collection
-      db.collection('users').doc(docID).collection('assets').doc(assetID).collection('calendar').doc(eventID).delete()
-      // remove booking to user's bookings collection
-      db.collection('users').doc(userID).collection('bookings').doc(bookingID).delete()
+    deleteCourt (asset) {
+      var assetID = asset.uid
+      var userData = this.userData
+      db.collection('users').doc(userData.uid).update({
+        courts: Number(userData.courts) - 1
+      })
+      db.collection('users').doc(userData.uid).collection('assets').doc(assetID).collection('calendar').get()
+        .then(function (querySnapshot) {
+          querySnapshot.forEach(function (doc) {
+            var docID = doc.id
+            db.collection('users').doc(userData.uid).collection('assets').doc(assetID).collection('calendar').doc(docID).delete()
+          })
+        })
+      db.collection('users').doc(userData.uid).collection('assets').doc(assetID).delete()
     }
   }
 }

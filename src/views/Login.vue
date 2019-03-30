@@ -6,7 +6,7 @@
       <form method="post">
         <input type="email" v-model="email" placeholder="Email" autocomplete="email" required>
         <br>
-        <input type="password" v-model="password" placeholder="Password" autocomplete="current-password" @keyup.enter="createUser()" required>
+        <input type="password" v-model="password" placeholder="Password" autocomplete="current-password" @keyup.enter="login()" required>
         <br>
         <button style="margin-top: 40px" type="button" @click="login()">Login</button>
       </form>
@@ -15,8 +15,10 @@
 </template>
 
 <script>
+// required to login a user
 import firebase from 'firebase/app'
 import 'firebase/auth'
+// required to call router within the function
 import router from '../router.js'
 export default {
   name: 'Login',
@@ -26,6 +28,7 @@ export default {
       password: ''
     }
   },
+  // methods are where the functions of a component are listed
   methods: {
     login () {
       firebase.auth().signInWithEmailAndPassword(this.email, this.password)

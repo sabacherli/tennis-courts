@@ -92,7 +92,7 @@ export default new Vuex.Store({
     },
     // this time is set on creation of the website
     setTime (state) {
-      state.now = moment()
+
     },
     // sets the time of today in different formats
     setToday (state) {
@@ -103,7 +103,8 @@ export default new Vuex.Store({
         }
       }
       // set today as a moment object
-      var today = moment()
+      state.now = moment()
+      var today = state.now
       state.time.yearAsNumber = today.format('YYYY')
       state.time.monthAsNumber = today.format('MM')
       state.time.monthAsString = today.format('MMMM')
@@ -135,7 +136,8 @@ export default new Vuex.Store({
         }
       }
       // set today as a moment object
-      var today = moment()
+      state.now = moment()
+      var today = state.now
       state.time.yearAsNumber = today.format('YYYY')
       state.time.monthAsNumber = today.format('MM')
       state.time.monthAsString = today.format('MMMM')

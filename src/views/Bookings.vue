@@ -5,7 +5,7 @@
     <div class="container">
       <!-- shows the user's tennis courts if the owner is logged in -->
       <div v-if="userData.role === 'Owner'">
-        <h2>Monitor the performance of your courts</h2>
+        <h2>Remove courts from being bookable</h2>
         <BookingsOwner></BookingsOwner>
       </div>
       <!-- shows the booked tennis courts if a player is logged in -->

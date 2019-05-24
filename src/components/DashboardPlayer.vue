@@ -83,7 +83,7 @@ export default {
       uniqueID: null
     }
   },
-  // methods executed as soon as this component is created
+  // mutations executed as soon as this component is created
   created () {
     this.$store.commit('getClubs')
   },
@@ -126,7 +126,7 @@ export default {
       var monthID = this.time.monthAsNumber
       var slotID = slot + 5
       var userID = this.userData.uid
-      // change the boolen isBooked to true and add the current user as the player
+      // change the boolean isBooked to true and add the current user as the player
       db.collection('users').doc(docID).collection('assets').doc(assetID).collection('calendar').doc(dayID + slotID).set({
         isBooked: true,
         player: userID,

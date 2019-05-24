@@ -9,7 +9,7 @@
       <input type="text" placeholder="e.g. Court 1" v-model="courtName">
       <label>Name</label>
       <br>
-      <!-- or when pressing the button -->
+      <!-- button to add a new court -->
       <button type="button" @click="addCourt()">Add Court</button>
     </form>
     <p class="instruction" style="margin-top: 160px; margin-bottom: -60px">An overview of the vacancy of your courts.</p>
@@ -60,7 +60,7 @@ export default {
       courtName: null
     }
   },
-  // methods executed as soon as this component is created
+  // mutations executed as soon as this component is created
   created () {
     setTimeout(function () {
       store.commit('setToday')

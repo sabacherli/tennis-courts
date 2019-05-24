@@ -1,5 +1,6 @@
 <template lang="html">
   <div>
+    <!-- content displayed for non-touch devices -->
     <div class="main-content">
       <h1>LOGIN</h1>
       <h2>Log in to your account</h2>
@@ -13,11 +14,7 @@
         </form>
       </div>
     </div>
-    <!-- Touch Devices -->
-    <div class="error-msg">
-      <h2>Error</h2>
-      <p>This site is only available on devices without touch capability</p>
-    </div>
+    <!-- error displayed for touch devices -->
     <div class="error-msg">
       <h2>Error</h2>
       <p>This site is only available on devices without touch capability</p>

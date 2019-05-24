@@ -1,5 +1,6 @@
 <template lang="html">
   <div>
+    <!-- content displayed for non-touch devices -->
     <div class="main-content">
       <h1>PLAYER</h1>
       <h2>Create an Account</h2>
@@ -13,7 +14,7 @@
         </form>
       </div>
     </div>
-    <!-- Touch Devices -->
+    <!-- error displayed for touch devices -->
     <div class="error-msg">
       <h2>Error</h2>
       <p>This site is only available on devices without touch capability</p>
@@ -38,7 +39,7 @@ export default {
       password: ''
     }
   },
-  // methods executed as soon as this component is created
+  // mutations executed as soon as this component is created
   created () {
     this.$store.commit('getClubs')
   },

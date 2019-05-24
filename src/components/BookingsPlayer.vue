@@ -31,7 +31,7 @@ export default {
       uniqueID: null
     }
   },
-  // methods executed as soon as this component is created
+  // mutations executed as soon as this component is created
   created () {
     this.$store.commit('setTime')
   },

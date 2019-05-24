@@ -38,7 +38,7 @@ export default {
           .onSnapshot(function (doc) {
             let userData = doc.data()
             store.commit('setUserData', userData)
-            // keep this reference as well
+            // keep this reference as well (same reason as in #35)
             unsubscribeAssets =
             db.collection('users').doc(userID).collection('assets').orderBy('name')
               .onSnapshot(function (querySnapshot) {

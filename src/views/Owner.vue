@@ -53,7 +53,7 @@ export default {
             courts: 0,
             assets: []
           })
-          // changes the page to dashboard page
+          // changes the page to the dashboard page
           router.push('dashboard')
         })
         .catch(function (error) {

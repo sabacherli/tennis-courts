@@ -73,7 +73,7 @@ export default {
           })
       } else {
         // unsubscribe from all the listeners to save bandwidth
-        // onSnapshot returns a function to unsubscribe from the listener, but will not be assign a function on load, hence the if condition checks if there is a function attached
+        // onSnapshot returns a function to unsubscribe from the listener, but will not be assigned a function on load, hence the if condition checks if there is a function attached
         if (unsubscribe) {
           unsubscribe()
           unsubscribeAssets()
@@ -92,6 +92,7 @@ export default {
 }
 </script>
 
+<!-- this styling is applied throughout all components and views -->
 <style>
 #app {
   position: absolute;

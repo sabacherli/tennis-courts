@@ -1,5 +1,4 @@
 <!-- This component is for the player bookings -->
-
 <template lang="html">
   <div class="container-component">
     <!-- if the bookingResult is not null, then show the following div -->
@@ -8,7 +7,7 @@
       <template v-for="booking in userData.bookings">
         <!-- the key directive is required by vue -->
         <div :key="booking.uid" class="div-asset">
-          <!-- the name of the court and time of the booking -->
+          <!-- information on the date, court name and time slot of each booking -->
           <p class="asset-name">{{ booking.date }}</p>
           <p class="asset-name">{{ booking.court }}</p>
           <p class="asset-name">{{ booking.time }} - {{ booking.time + 1 }} o'clock</p>
@@ -26,11 +25,13 @@ import { mapState } from 'vuex'
 import db from '@/database.js'
 export default {
   name: 'BookingsPlayer',
+  // data specific to this component and not stored in the store
   data () {
     return {
       uniqueID: null
     }
   },
+  // methods executed as soon as this component is created
   created () {
     this.$store.commit('setTime')
   },
@@ -57,6 +58,7 @@ export default {
 }
 </script>
 
+<!-- styling scoped to this component -->
 <style lang="css" scoped>
 label {
   position: relative;

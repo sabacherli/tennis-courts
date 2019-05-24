@@ -5,7 +5,8 @@ import moment from 'moment'
 // needed to interact with the database
 import db from '@/database.js'
 
-// Data shared between components is stored in this file. Components must read application data from this location to prevent conflict
+// data shared between components is stored in this file
+// components must read application data from this location to prevent conflict
 Vue.use(Vuex)
 // it has to be required before use
 Vue.use(Vuex, moment)
@@ -81,8 +82,8 @@ export default new Vuex.Store({
       }
       filter.isActive = true
     },
+    // set the search filter active and all the rest false
     setFilter (state) {
-      // set the search filter active and all the rest false
       for (let f in state.playerFilters) {
         if (state.playerFilters[f].text === 'Search') {
           state.playerFilters[f].isActive = true

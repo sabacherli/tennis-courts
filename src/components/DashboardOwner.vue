@@ -1,5 +1,4 @@
 <!-- This component is for the player owner -->
-
 <template lang="html">
   <div>
     <!-- this unique ID can be used in the search field to directly find this club -->
@@ -55,11 +54,13 @@ import db from '@/database.js'
 import store from '../store'
 export default {
   name: 'DashboardOwner',
+  // data specific to this component and not stored in the store
   data () {
     return {
       courtName: null
     }
   },
+  // methods executed as soon as this component is created
   created () {
     setTimeout(function () {
       store.commit('setToday')
@@ -116,6 +117,7 @@ export default {
 }
 </script>
 
+<!-- styling scoped to this component -->
 <style lang="css" scoped>
 input {
   position: relative;

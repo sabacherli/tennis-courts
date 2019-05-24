@@ -6,6 +6,7 @@ import './registerServiceWorker'
 
 Vue.config.productionTip = false
 
+// this is were the entire app gets loaded and rendered
 new Vue({
   router,
   store,

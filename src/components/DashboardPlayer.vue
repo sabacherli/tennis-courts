@@ -1,5 +1,4 @@
 <!-- This component is for the player dashboard -->
-
 <template lang="html">
   <div class="container-component">
     <div class="container-filters">
@@ -25,7 +24,7 @@
         </div>
       </template>
     </div>
-    <!-- is the search filter is active, then show the search field -->
+    <!-- if the search filter is active, then show the search field -->
     <div v-if="playerFilters[1].isActive">
       <p class="instruction">Enter the ID of a known tennis club:</p>
       <form>
@@ -74,15 +73,17 @@ import { mapState } from 'vuex'
 import moment from 'moment'
 // required to interact with the database
 import db from '@/database.js'
-// requred to call commit from within firebase callback
+// required to call commit from within firebase callback
 import store from '../store.js'
 export default {
   name: 'DashboardPlayer',
+  // data specific to this component and not stored in the store
   data () {
     return {
       uniqueID: null
     }
   },
+  // methods executed as soon as this component is created
   created () {
     this.$store.commit('getClubs')
   },
@@ -162,6 +163,7 @@ export default {
 }
 </script>
 
+<!-- styling scoped to this component -->
 <style lang="css" scoped>
 @keyframes expand {
   from {

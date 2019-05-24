@@ -1,5 +1,4 @@
 <!-- This component is for the menu -->
-
 <template lang="html">
   <div id="container" class="dropdown">
     <!-- icon shown in the top left corner -->
@@ -70,27 +69,13 @@ export default {
 }
 </script>
 
+<!-- styling scoped to this component -->
 <style lang="css" scoped>
-.dropdown-item {
-  font-size: 1.2em;
-  font-weight: 600;
-  transition: .4s ease-in-out;
-}
-.dropdown-item-selected {
-  text-decoration: underline;
-  transition: .4s ease-in-out;
-}
-.dropdown-item-break {
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 14px;
-  margin-bottom: 14px;
-  width: 12%;
-  border: 0px;
-  border-bottom-style: solid;
-  border-bottom-color: black;
-  border-bottom-width: 3px;
+@media (hover:none) {
+  /* Touch devices */
+  .dropdown {
+    display: none;
+  }
 }
 @media (hover:hover) {
   /* Mouse devices */
@@ -116,6 +101,27 @@ export default {
     height: 1.875em;
     width: 1.875em;
     transition: .8s ease-in-out;
+  }
+  .dropdown-item {
+    font-size: 1.2em;
+    font-weight: 600;
+    transition: .4s ease-in-out;
+  }
+  .dropdown-item-selected {
+    text-decoration: underline;
+    transition: .4s ease-in-out;
+  }
+  .dropdown-item-break {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 14px;
+    margin-bottom: 14px;
+    width: 12%;
+    border: 0px;
+    border-bottom-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 3px;
   }
   .dropdown:hover .dropdown-nav {
     left: 0;

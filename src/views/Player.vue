@@ -39,10 +39,6 @@ export default {
       password: ''
     }
   },
-  // mutations executed as soon as this component is created
-  created () {
-    this.$store.commit('getClubs')
-  },
   // methods are where the functions of a component are listed
   methods: {
     createPlayer () {
@@ -54,7 +50,8 @@ export default {
             email: user.user.email,
             uid: user.user.uid,
             role: 'Player',
-            bookings: []
+            bookings: [],
+            favorites: []
           })
           // changes the page to dashboard page
           router.push('dashboard')
@@ -99,7 +96,7 @@ export default {
   }
   h2 {
     position: relative;
-    top: 95px;
+    top: 120px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 1.9em;

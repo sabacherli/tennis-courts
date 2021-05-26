@@ -125,8 +125,7 @@ input {
   left: 50%;
   transform: translateX(-50%);
   width: 300px;
-  font-size: 16px;
-  font-family: Montserrat;
+  font-size: 1.2em;
   background: transparent;
   border: 0px;
   border-bottom: 2px solid black;
@@ -169,7 +168,6 @@ button {
   border-bottom: 2px solid black;
 }
 .asset-name {
-  display: inline-block;
   float: left;
   margin-left: 40px;
   font-size: 1.2em;

@@ -3,7 +3,7 @@
   <div class="container-component">
     <!-- if the bookingResult is not null, then show the following div -->
     <div v-if="userData.assets" class="container-assets">
-      <!-- this template is displayed for all bookings in userData.bookings -->
+      <!-- this template is displayed for all bookings in ownerAssets -->
       <template v-for="asset in userData.assets">
         <!-- the key directive is required by vue -->
         <div :key="asset.uid" class="div-asset">

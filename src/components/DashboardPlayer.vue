@@ -13,11 +13,25 @@
         </div>
       </template>
     </div>
-    <!-- is the popular clubs filter is active, then show the popular clubs -->
+    <!-- is the favorite clubs filter is active, then show the favorite clubs -->
     <div v-if="playerFilters[0].isActive" class="container-clubs">
-      <!-- this template is displayer for all popular clubs -->
-      <template v-for="club in popularClubs">
+      <!-- this template is displayer for all favorite clubs -->
+      <template v-for="club in favoriteClubs">
         <div :key="club.uid" class="div-club">
+          <button type="button" class="favorites" @click="removeFromFavorites(club)">&#9733;</button>
+          <span class="club-name">Unique ID: {{ club.uid }}</span>
+          <span class="club-courts">Courts: {{ club.courts }}</span>
+          <button type="button" class="check-availability" @click="checkAvailability(club)">Check Availability</button>
+        </div>
+      </template>
+    </div>
+    <!-- is the nearest clubs filter is active, then show the nearest clubs -->
+    <div v-if="playerFilters[1].isActive" class="container-clubs">
+      <!-- this template is displayer for all nearest clubs -->
+      <template v-for="club in nearestClubs">
+        <div :key="club.uid" class="div-club">
+          <button v-if="!(userData.favorites.includes(club.uid))" type="button" class="favorites" @click="addToFavorites(club)">&#9734;</button>
+          <button v-else type="button" class="favorites" @click="removeFromFavorites(club)">&#9733;</button>
           <span class="club-name">Unique ID: {{ club.uid }}</span>
           <span class="club-courts">Courts: {{ club.courts }}</span>
           <button type="button" class="check-availability" @click="checkAvailability(club)">Check Availability</button>
@@ -25,11 +39,11 @@
       </template>
     </div>
     <!-- if the search filter is active, then show the search field -->
-    <div v-if="playerFilters[1].isActive">
+    <div v-if="playerFilters[2].isActive">
       <p class="instruction">Enter the ID of a known tennis club:</p>
       <form>
         <!-- the v-model is used to retrieve the input data -->
-        <input type="text" placeholder="e.g. wPpDZo3Qrdz3Pkh2G6XW" v-model="uniqueID">
+        <input type="text" placeholder="e.g. wPpDZo3Qrdz3Pkh2G6XW" v-model="searchID">
         <label>Unique ID</label>
         <br>
         <button type="button" @click="searchClub()">Search</button>
@@ -85,7 +99,8 @@ export default {
   },
   // mutations executed as soon as this component is created
   created () {
-    this.$store.commit('getClubs')
+    this.$store.commit('getNearestClubs')
+    this.$store.commit('getFavoriteClubs')
   },
   computed: {
     ...mapState([
@@ -93,7 +108,9 @@ export default {
       'searchResultAssets',
       'searchID',
       'playerFilters',
-      'popularClubs',
+      'playerBookings',
+      'nearestClubs',
+      'favoriteClubs',
       'time'
     ])
   },
@@ -102,8 +119,10 @@ export default {
     selectFilter (filter) {
       // commits the selectFilter function with the payload of the clicked filter in vuex
       store.commit('selectFilter', filter)
-      // required to retrieve today's date
-      store.commit('searchToday')
+      if (filter.text === 'Search') {
+        // required to retrieve today's date
+        store.commit('searchToday')
+      }
     },
     checkAvailability (club) {
       var id = club.uid
@@ -111,10 +130,44 @@ export default {
       store.commit('searchClub', id)
       // display it in the search section
       store.commit('setFilter')
+      // required to retrieve today's date
+      store.commit('searchToday')
+    },
+    addToFavorites (club) {
+      var id = club.uid
+      this.$set(this.userData.favorites, this.userData.favorites.length, id)
+      var favorites = this.userData.favorites
+      // add the club's uid to the player's favorites
+      db.collection('users').doc(this.userData.uid).update({
+        favorites: favorites
+      })
+        .then(() => {
+          this.$store.commit('getFavoriteClubs')
+        })
+        .catch((error) => {
+          // The document probably doesn't exist.
+          console.error('Error updating document: ', error)
+        })
+    },
+    removeFromFavorites (club) {
+      var id = club.uid
+      // remove the club uid from the favorites array
+      var favorites = this.userData.favorites.filter(function (e) { return e !== id })
+      // add the club's uid to the player's favorites
+      db.collection('users').doc(this.userData.uid).update({
+        favorites: favorites
+      })
+        .then(() => {
+          this.$store.commit('getFavoriteClubs')
+        })
+        .catch((error) => {
+          // The document probably doesn't exist.
+          console.error('Error updating document: ', error)
+        })
     },
     searchClub () {
       // declare the payload variable and commit the mutation
-      var id = this.uniqueID
+      var id = this.searchID
       store.commit('searchClub', id)
     },
     bookCourt (asset, slot) {
@@ -179,8 +232,7 @@ input {
   left: 50%;
   transform: translateX(-50%);
   width: 300px;
-  font-size: 16px;
-  font-family: Montserrat;
+  font-size: 1.2em;
   background: transparent;
   border: 0px;
   border-bottom: 2px solid black;
@@ -233,10 +285,19 @@ button {
   height: 50px;
   border-bottom: 2px solid black;
 }
+.favorites {
+  float: left;
+  top: -12px;
+  margin-bottom: 0;
+  font-size: 2em;
+  font-weight: 600;
+  border: none;
+}
 .club-name {
   float: left;
   margin-left: 40px;
   width: 450px;
+  text-align: left;
   font-size: 1.2em;
   font-weight: 600;
 }
@@ -266,7 +327,6 @@ button {
   border-bottom: 2px solid black;
 }
 .asset-name {
-  display: inline-block;
   float: left;
   margin-left: 40px;
   font-size: 1.2em;

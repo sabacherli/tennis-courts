@@ -2,9 +2,9 @@
 <template lang="html">
   <div class="container-component">
     <!-- if the bookingResult is not null, then show the following div -->
-    <div v-if="userData.bookings" class="container-assets">
-      <!-- this template is displayed for all bookings in userData.bookings -->
-      <template v-for="booking in userData.bookings">
+    <div v-if="playerBookings" class="container-assets">
+      <!-- this template is displayed for all bookings in playerBookings -->
+      <template v-for="booking in playerBookings">
         <!-- the key directive is required by vue -->
         <div :key="booking.uid" class="div-asset">
           <!-- information on the date, court name and time slot of each booking -->
@@ -37,7 +37,8 @@ export default {
   },
   computed: {
     ...mapState([
-      'userData'
+      'userData',
+      'playerBookings'
     ])
   },
   // methods are where the functions of a component are listed
@@ -86,7 +87,6 @@ button {
   border-bottom: 2px solid black;
 }
 .asset-name {
-  display: inline-block;
   float: left;
   margin-left: 40px;
   font-size: 1.2em;

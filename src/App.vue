@@ -16,15 +16,9 @@ import store from './store'
 export default {
   created () {
     // define the variables
-    var unsubscribe
-    var unsubscribeAssets
-    var unsubscribeBookings
-    // if the variable has already been assigned a callback to unsubscribe, then unsubscribe from the listener
-    if (unsubscribe) {
-      unsubscribe()
-      unsubscribeAssets()
-      unsubscribeBookings()
-    }
+    var unsubscribeUserData
+    var unsubscribeUserDataAssets
+    var unsubscribeUserDataBookings
     // set the time of today in different formats
     store.commit('setTime')
     // check if the user authentication state has changed
@@ -33,51 +27,40 @@ export default {
       if (user) {
         var userID = user.uid
         // keep a reference to the snapshot so we can call the callback to stop listenting once the user is logged out
-        unsubscribe =
-        db.collection('users').doc(userID)
-          .onSnapshot(function (doc) {
-            let userData = doc.data()
-            store.commit('setUserData', userData)
-            // keep this reference as well (same reason as in #35)
-            unsubscribeAssets =
-            db.collection('users').doc(userID).collection('assets').orderBy('name')
-              .onSnapshot(function (querySnapshot) {
-                // empty the array of assets before repopulating it
-                store.commit('emptyUserDataAssets')
-                // define an empty array that we can fill
-                let userDataAssetsArray = []
-                // get all the documents with a forEach loop
-                querySnapshot.forEach(function (doc) {
-                  let data = doc.data()
-                  userDataAssetsArray.push(data)
-                })
-                // push all assets into vuex state management
-                store.commit('setUserDataAssets', userDataAssetsArray)
+        unsubscribeUserData =
+          db.collection('users').doc(userID)
+            .onSnapshot(function (doc) {
+              store.commit('setUserData', doc.data())
+            })
+        // keep a reference to the snapshot so we can call the callback to stop listenting once the user is logged out
+        unsubscribeUserDataAssets =
+          db.collection('users').doc(userID).collection('assets').orderBy('name')
+            .onSnapshot(function (querySnapshot) {
+              let userDataAssets = []
+              querySnapshot.forEach(function (doc) {
+                userDataAssets.push(doc.data())
               })
-            // keep this reference as well
-            unsubscribeBookings =
-            db.collection('users').doc(userID).collection('bookings').where('uid', '>=', moment().format('YYYYMMDD')).orderBy('uid')
-              .onSnapshot(function (querySnapshot) {
-                // empty the array of assets before repopulating it
-                store.commit('emptyUserDataBookings')
-                // define an empty array that we can fill
-                let userDataBookingsArray = []
-                // get all the documents with a forEach loop
-                querySnapshot.forEach(function (doc) {
-                  let data = doc.data()
-                  userDataBookingsArray.push(data)
-                })
-                // push all assets into vuex state management
-                store.commit('setUserDataBookings', userDataBookingsArray)
+              // push all assets into vuex state management
+              store.commit('setUserDataAssets', userDataAssets)
+            })
+        // keep a reference to the snapshot so we can call the callback to stop listenting once the user is logged out
+        unsubscribeUserDataBookings =
+          db.collection('users').doc(userID).collection('bookings').where('uid', '>=', moment().format('YYYYMMDD')).orderBy('uid')
+            .onSnapshot(function (querySnapshot) {
+              let playerBookings = []
+              querySnapshot.forEach(function (doc) {
+                playerBookings.push(doc.data())
               })
-          })
+              // push all assets into vuex state management
+              store.commit('setPlayerBookings', playerBookings)
+            })
       } else {
         // unsubscribe from all the listeners to save bandwidth
         // onSnapshot returns a function to unsubscribe from the listener, but will not be assigned a function on load, hence the if condition checks if there is a function attached
-        if (unsubscribe) {
-          unsubscribe()
-          unsubscribeAssets()
-          unsubscribeBookings()
+        if (unsubscribeUserData) {
+          unsubscribeUserData()
+          unsubscribeUserDataAssets()
+          unsubscribeUserDataBookings()
         }
         // remove the userData
         store.commit('emptyUserData')
@@ -102,12 +85,10 @@ export default {
   width: 100%;
   text-align: center;
   color: black;
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Avenir', Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-weight: 500;
-}
-body {
 }
 button {
   position: relative;
@@ -133,7 +114,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active  {
-    -webkit-box-shadow: 0 0 0 30px white inset !important;
-    outline: none;
+  box-shadow: 0 0 0 30px white inset !important;
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  outline: none;
 }
 </style>

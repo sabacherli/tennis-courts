@@ -14,22 +14,29 @@ Vue.use(Vuex, moment)
 export default new Vuex.Store({
   // in state, the variables are defined
   state: {
-    userData: null,
+    userData: {},
     searchResultAssets: null,
     searchID: null,
     playerFilters: [
       {
-        text: 'Most Popular',
+        text: 'Favorites',
         isActive: true,
         uid: 1
       },
       {
-        text: 'Search',
+        text: 'Around me',
         isActive: false,
         uid: 2
+      },
+      {
+        text: 'Search',
+        isActive: false,
+        uid: 3
       }
     ],
-    popularClubs: [],
+    playerBookings: [],
+    nearestClubs: [],
+    favoriteClubs: [],
     now: null,
     time: {
       yearAsNumber: null,
@@ -43,7 +50,8 @@ export default new Vuex.Store({
     unsubscribeEvents: [],
     unsubscribeSlots: null,
     unsubscribeBookings: null,
-    unsubscribeAssets: null
+    unsubscribeAssets: null,
+    unsubscribeUserData: null
   },
   // mutations are the functions that mutate the state variables
   mutations: {
@@ -55,25 +63,13 @@ export default new Vuex.Store({
     emptyUserData (state) {
       state.userData = null
     },
-    // empties the userData.assets array to avoid pushing the same asset into the array if data changes in the back-end
-    emptyUserDataAssets (state) {
-      state.userData.assets.length = 0
+    // assets of the user are populated with the data from firebase
+    setUserDataAssets (state, userDataAssets) {
+      state.userData.assets = userDataAssets
     },
-    // pushes each asset into the userData.assets array
-    setUserDataAssets (state, userDataAssetsArray) {
-      for (let asset in userDataAssetsArray) {
-        state.userData.assets.push(userDataAssetsArray[asset])
-      }
-    },
-    // empties the userData.bookings array to avoid pushing the same booking into the array if data changes in the back-end
-    emptyUserDataBookings (state) {
-      state.userData.bookings.length = 0
-    },
-    // pushes each booking into the userData.bookings array
-    setUserDataBookings (state, userDataBookingsArray) {
-      for (let booking in userDataBookingsArray) {
-        state.userData.bookings.push(userDataBookingsArray[booking])
-      }
+    // bookings of the user are populated with the data from firebase
+    setPlayerBookings (state, playerBookings) {
+      state.playerBookings = playerBookings
     },
     // sets all filters as false before setting the clicked filter as true
     selectFilter (state, filter) {
@@ -291,18 +287,36 @@ export default new Vuex.Store({
           })
       }
     },
-    getClubs (state) {
+    getNearestClubs (state) {
       // empty the array to avoid doubles
-      state.popularClubs = []
+      state.nearestClubs = []
       // get all documents where the role of the document is owner and order the query by the amoung of courts - this requires an indexing of the project in firebase
       db.collection('users').where('role', '==', 'Owner').orderBy('courts').get()
         .then(function (querySnapshot) {
           querySnapshot.forEach(function (doc) {
             let club = doc.data()
-            // push each document into the state array popularClubs
-            state.popularClubs.push(club)
+            // push each document into the state array nearestClubs
+            state.nearestClubs.push(club)
           })
         })
+    },
+    getFavoriteClubs (state) {
+      // empty the array to avoid doubles
+      state.favoriteClubs.splice(0)
+      // get all documents where the role of the document is owner and order the query by the amoung of courts - this requires an indexing of the project in firebase
+      for (let index = 0; index < state.userData.favorites.length; index++) {
+        const club = state.userData.favorites[index]
+        db.collection('users').doc(club).get().then((doc) => {
+          if (doc.exists) {
+            Vue.set(state.favoriteClubs, state.favoriteClubs.length, doc.data())
+          } else {
+            // doc.data() will be undefined in this case
+            console.log('No such document!')
+          }
+        }).catch((error) => {
+          console.log('Error getting document:', error)
+        })
+      }
     },
     searchClub (state, id) {
       // set today as a date variable

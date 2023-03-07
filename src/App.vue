@@ -17,8 +17,8 @@ export default {
   created () {
     // define the variables
     var unsubscribeUserData
-    var unsubscribeUserDataAssets
-    var unsubscribeUserDataBookings
+    var unsubscribeOwnerAssets
+    var unsubscribePlayerBookings
     // set the time of today in different formats
     store.commit('setTime')
     // check if the user authentication state has changed
@@ -33,18 +33,18 @@ export default {
               store.commit('setUserData', doc.data())
             })
         // keep a reference to the snapshot so we can call the callback to stop listenting once the user is logged out
-        unsubscribeUserDataAssets =
+        unsubscribeOwnerAssets =
           db.collection('users').doc(userID).collection('assets').orderBy('name')
             .onSnapshot(function (querySnapshot) {
-              let userDataAssets = []
+              let ownerAssets = []
               querySnapshot.forEach(function (doc) {
-                userDataAssets.push(doc.data())
+                ownerAssets.push(doc.data())
               })
               // push all assets into vuex state management
-              store.commit('setUserDataAssets', userDataAssets)
+              store.commit('setOwnerAssets', ownerAssets)
             })
         // keep a reference to the snapshot so we can call the callback to stop listenting once the user is logged out
-        unsubscribeUserDataBookings =
+        unsubscribePlayerBookings =
           db.collection('users').doc(userID).collection('bookings').where('uid', '>=', moment().format('YYYYMMDD')).orderBy('uid')
             .onSnapshot(function (querySnapshot) {
               let playerBookings = []
@@ -59,8 +59,8 @@ export default {
         // onSnapshot returns a function to unsubscribe from the listener, but will not be assigned a function on load, hence the if condition checks if there is a function attached
         if (unsubscribeUserData) {
           unsubscribeUserData()
-          unsubscribeUserDataAssets()
-          unsubscribeUserDataBookings()
+          unsubscribeOwnerAssets()
+          unsubscribePlayerBookings()
         }
         // remove the userData
         store.commit('emptyUserData')
@@ -116,6 +116,9 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active  {
   box-shadow: 0 0 0 30px white inset !important;
   -webkit-box-shadow: 0 0 0 30px white inset !important;
+  outline: none;
+}
+input:focus {
   outline: none;
 }
 </style>

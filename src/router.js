@@ -42,6 +42,14 @@ export default new Router({
       }
     },
     {
+      path: '/settings',
+      name: 'Settings',
+      components: {
+        dropdown: () => import(/* webpackChunkName: "dropdown" */ './components/Dropdown.vue'),
+        default: () => import(/* webpackChunkName: "bookings" */ './views/Settings.vue')
+      }
+    },
+    {
       path: '/dashboard',
       name: 'Dashboard',
       components: {

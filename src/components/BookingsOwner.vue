@@ -2,9 +2,9 @@
 <template lang="html">
   <div class="container-component">
     <!-- if the bookingResult is not null, then show the following div -->
-    <div v-if="userData.assets" class="container-assets">
+    <div v-if="ownerAssets" class="container-assets">
       <!-- this template is displayed for all bookings in ownerAssets -->
-      <template v-for="asset in userData.assets">
+      <template v-for="asset in ownerAssets">
         <!-- the key directive is required by vue -->
         <div :key="asset.uid" class="div-asset">
           <!-- the name of the court and time of the booking -->
@@ -22,6 +22,8 @@
 import { mapState } from 'vuex'
 // required to interact with the database
 import db from '@/database.js'
+// required to call commit inside another function
+import store from '../store.js'
 export default {
   name: 'BookingsOwner',
   // data specific to this component and not stored in the store
@@ -32,13 +34,14 @@ export default {
   },
   // mutations executed as soon as this component is created
   created () {
-    this.$store.commit('setTime')
-    this.$store.commit('setToday')
+    store.commit('setTime')
+    store.commit('setToday')
   },
   computed: {
     // data that is made available from the store as soon as the component is computed
     ...mapState([
-      'userData'
+      'userData',
+      'ownerAssets'
     ])
   },
   // methods are where the functions of a component are listed

@@ -15,8 +15,8 @@
     <p class="instruction" style="margin-top: 160px; margin-bottom: -60px">An overview of the vacancy of your courts.</p>
     <div v-if="userData.courts === 0" style="margin-bottom: 60px"></div>
     <div class="container-assets">
-      <!-- this template is displayed for all assets in userData.assets -->
-      <template v-for="asset in userData.assets">
+      <!-- this template is displayed for all assets in ownerAssets -->
+      <template v-for="asset in ownerAssets">
         <!-- the key directive is required by vue -->
         <div :key="asset.uid" class="div-asset">
           <div class="container-slots">
@@ -26,7 +26,7 @@
               <div :key="slot" class="time-slot">
                 <!-- if the slot is booked, display a red background, else a green background -->
                 <div v-if="asset.day.some(e => e.slot === slot + 5)" class="time-slot-booked"></div>
-                <div v-else class="time-slot-free" @click="bookCourt(asset, slot)"></div>
+                <div v-else class="time-slot-free"></div>
                 <div class="time-delimiter">{{ slot + 5 }}h</div>
               </div>
             </template>
@@ -51,7 +51,7 @@ import { mapState } from 'vuex'
 // required to interact with the database
 import db from '@/database.js'
 // required to call commit inside another function
-import store from '../store'
+import store from '../store.js'
 export default {
   name: 'DashboardOwner',
   // data specific to this component and not stored in the store
@@ -69,6 +69,7 @@ export default {
   computed: {
     ...mapState([
       'userData',
+      'ownerAssets',
       'time'
     ])
   },
@@ -103,15 +104,15 @@ export default {
     },
     setTomorrow () {
       // calls the setTomorrow function in the vuex state management
-      this.$store.commit('setTomorrow')
+      store.commit('setTomorrow')
     },
     setYesterday () {
       // calls the setYesterday function in the vuex state management
-      this.$store.commit('setYesterday')
+      store.commit('setYesterday')
     },
     setToday () {
       // calls the setToday function in the vuex state management
-      this.$store.commit('setToday')
+      store.commit('setToday')
     }
   }
 }

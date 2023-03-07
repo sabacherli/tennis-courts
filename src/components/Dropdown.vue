@@ -11,8 +11,11 @@
       <span v-if="userData === null" id="register" class="dropdown-item" @click='goRegister()'>REGISTER</span>
       <!-- short line in between the menu options -->
       <div class="dropdown-item-break"></div>
-      <span v-if="userData !== null && userData.role === 'Player'" id="bookings" class="dropdown-item" @click='goBookings()'>BOOKINGS</span>
-      <span v-if="userData !== null && userData.role === 'Owner'" id="bookings" class="dropdown-item" @click='goBookings()'>COURTS</span>
+      <span v-if="userData !== null && userData.role === 'Player'" class="dropdown-item" @click='goBookings()'>BOOKINGS</span>
+      <span v-if="userData !== null && userData.role === 'Owner'" class="dropdown-item" @click='goBookings()'>COURTS</span>
+      <!-- short line in between the menu options -->
+      <div v-if="userData !== null" class="dropdown-item-break"></div>
+      <span v-if="userData !== null" class="dropdown-item" @click='goSettings()'>SETTINGS</span>
       <!-- short line in between the menu options -->
       <div v-if="userData !== null" class="dropdown-item-break"></div>
       <!-- show the logout option if the user is logged in -->
@@ -48,6 +51,9 @@ export default {
     },
     goBookings () {
       router.push('bookings')
+    },
+    goSettings () {
+      router.push('settings')
     },
     goLogin () {
       router.push('login')

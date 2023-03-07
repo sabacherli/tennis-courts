@@ -49,7 +49,7 @@
         <button type="button" @click="searchClub()">Search</button>
       </form>
       <div class="container-assets">
-        <!-- this template is displayed for all assets in userData.assets -->
+        <!-- this template is displayed for all assets in ownerAssets -->
         <template v-for="asset in searchResultAssets">
           <!-- the key directive is required by vue -->
           <div :key="asset.uid" class="div-asset">
@@ -99,8 +99,8 @@ export default {
   },
   // mutations executed as soon as this component is created
   created () {
-    this.$store.commit('getNearestClubs')
-    this.$store.commit('getFavoriteClubs')
+    store.commit('getNearestClubs')
+    store.commit('getFavoriteClubs')
   },
   computed: {
     ...mapState([
@@ -142,7 +142,7 @@ export default {
         favorites: favorites
       })
         .then(() => {
-          this.$store.commit('getFavoriteClubs')
+          store.commit('getFavoriteClubs')
         })
         .catch((error) => {
           // The document probably doesn't exist.
@@ -158,7 +158,7 @@ export default {
         favorites: favorites
       })
         .then(() => {
-          this.$store.commit('getFavoriteClubs')
+          store.commit('getFavoriteClubs')
         })
         .catch((error) => {
           // The document probably doesn't exist.
@@ -202,15 +202,15 @@ export default {
     },
     searchTomorrow () {
       // calls the searchTomorrow function in the vuex state management
-      this.$store.commit('searchTomorrow')
+      store.commit('searchTomorrow')
     },
     searchYesterday () {
       // calls the searchYesterday function in the vuex state management
-      this.$store.commit('searchYesterday')
+      store.commit('searchYesterday')
     },
     searchToday () {
       // calls the searchToday function in the vuex state management
-      this.$store.commit('searchToday')
+      store.commit('searchToday')
     }
   }
 }

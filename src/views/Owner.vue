@@ -51,6 +51,9 @@ export default {
             uid: user.user.uid,
             role: 'Owner',
             courts: 0,
+            opensAt: '07 00',
+            closesAt: '22 00',
+            slotDuration: '45',
             assets: []
           })
           // changes the page to the dashboard page

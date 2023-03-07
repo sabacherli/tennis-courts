@@ -2,7 +2,7 @@
 <template lang="html">
   <div class="container-component">
     <!-- if the bookingResult is not null, then show the following div -->
-    <div v-if="playerBookings" class="container-assets">
+    <div v-if="playerBookings.length > 0" class="container-assets">
       <!-- this template is displayed for all bookings in playerBookings -->
       <template v-for="booking in playerBookings">
         <!-- the key directive is required by vue -->
@@ -15,6 +15,12 @@
         </div>
       </template>
     </div>
+    <div v-if="playerBookings.length === 0" class="container-assets">
+      <div class="div-asset">
+        <!-- information on the date, court name and time slot of each booking -->
+        <p class="asset-name">You don't have any reservations</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -23,6 +29,8 @@
 import { mapState } from 'vuex'
 // required to interact with the database
 import db from '@/database.js'
+// required to call commit inside another function
+import store from '../store.js'
 export default {
   name: 'BookingsPlayer',
   // data specific to this component and not stored in the store
@@ -33,7 +41,7 @@ export default {
   },
   // mutations executed as soon as this component is created
   created () {
-    this.$store.commit('setTime')
+    store.commit('setTime')
   },
   computed: {
     ...mapState([
